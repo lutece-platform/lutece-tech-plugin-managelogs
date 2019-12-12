@@ -1,0 +1,41 @@
+<#include "managelogsproperties_tabs.html" />
+<@tabs tab="download" />
+
+<@rowBox>
+    <@boxHeader i18nTitleKey="managelogs.manage_logdownload.title">
+        <@headerButtons>
+
+        </@headerButtons>
+    </@boxHeader>
+    <@boxBody>
+    <@messages infos=infos />
+
+    <#if logs_list?has_content>
+        <@table>
+                <tr>
+                    <th>#i18n{managelogs.manage_logdownload.filename}</th>
+                    <th></th>
+                </tr>
+                <@tableHeadBodySeparator />
+                    <#list logs_list as log >
+                        <tr>
+                            <td>${log.name!}</td>
+                            <td>
+                                <form class="form-horizontal" action="jsp/admin/plugins/managelogs/DownloadLog.jsp" method="post" name="download" role="form">
+                                    <input type="hidden" name="idLog" value="${log.code!}">
+                                    <button class="btn btn-primary btn-flat" type="submit" title="Telecharger log" name="action_download">
+                                        <i class="fa fa-download" aria-hidden="true"></i>
+                                        #i18n{managelogs.manage_logdownload.download}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </#list>
+
+         </@table>
+    <#else>
+        <span>#i18n{managelogs.manage_logdownload.empty}</span>
+    </#if>
+
+  </@boxBody>
+</@rowBox>

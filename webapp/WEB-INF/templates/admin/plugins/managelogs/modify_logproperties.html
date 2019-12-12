@@ -1,0 +1,15 @@
+<#include "managelogsproperties_tabs.html" />
+<@tabs tab="logproperties" />
+
+<@rowBoxHeader i18nTitleKey="managelogs.modify_logproperties.title">
+    <form class="form-horizontal" method="post" name="modify_logproperties" action="jsp/admin/plugins/managelogs/ManageLogProperties.jsp">
+        <@messages errors=errors />
+
+        <#if logproperties.currentProperties == ''>
+            <@fieldTextArea cssClass='form-control properties-textarea' i18nLabelKey="managelogs.modify_logproperties.labelCurrentProperties" inputName="current_properties"  value="${logproperties.defaultProperties!''}" i18nHelpBlockKey="managelogs.modify_logproperties.labelCurrentProperties.help" />
+        <#else>
+            <@fieldTextArea cssClass='form-control properties-textarea' i18nLabelKey="managelogs.modify_logproperties.labelCurrentProperties" inputName="current_properties"  value="${logproperties.currentProperties!''}" i18nHelpBlockKey="managelogs.modify_logproperties.labelCurrentProperties.help" />
+        </#if>
+        <@actionButtons button1Name="action_modifyLogProperties" button2Name="view_manageLogProperties"/>
+    </form>
+</@rowBoxHeader>

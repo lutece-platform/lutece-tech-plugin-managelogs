@@ -1,0 +1,67 @@
+<#include "managelogsproperties_tabs.html" />
+<@tabs tab="logproperties" />
+
+<@rowBox>
+    <@boxHeader i18nTitleKey="managelogs.manage_logproperties.title">
+        <@headerButtons>
+
+    </@headerButtons>
+    </@boxHeader>
+    <@boxBody>
+    <@messages infos=infos />
+
+
+    <@table>
+        <tr>
+            <input type="hidden" id="id" name="id"/>
+            <th />
+            <th />
+        </tr>
+        <@tableHeadBodySeparator />
+        <tr>
+            <td>
+                <textarea class="properties-textarea" disabled="disabled">${logproperties.currentProperties!''}</textarea>
+            </td>
+            <td>
+                <dl>
+
+                    <dt>#i18n{managelogs.manage_logproperties.tmplog.exists}
+                    <#if tmplogexists! == 'true' >
+                        <em class="glyphicon glyphicon-ok bg-green">#i18n{managelogs.manage_logproperties.yes}</em>
+                    <#else>
+                        <em class="glyphicon glyphicon-remove bg-red">#i18n{managelogs.manage_logproperties.no}</em>
+                    </#if>
+                    </dt>
+
+                    <br>
+
+                    <dt>#i18n{managelogs.manage_logproperties.tmplog.used}
+                    <#if tmplogused! == 'true' >
+                        <em class="glyphicon glyphicon-ok bg-green">#i18n{managelogs.manage_logproperties.yes}</em>
+                    <#else>
+                        <em class="glyphicon glyphicon-remove bg-red">#i18n{managelogs.manage_logproperties.no}</em>
+                    </#if>
+                    </dt>
+
+                    <br>
+
+                    <dt>#i18n{managelogs.manage_logproperties.inuse.log}</dt> <dd>${conffile!}</dd>
+                    <br>
+                    <a href="jsp/admin/plugins/managelogs/ManageLogProperties.jsp?view=modifyLogProperties"
+                       class="btn btn-primary btn-sm" title="#i18n{portal.util.labelModify}">
+                        #i18n{managelogs.manage_logproperties.modify}
+                    </a>
+                    <#if tmplogexists! == 'true'>
+                        <!-- Tmp log conf file exists, add delete button -->
+                        <a href="jsp/admin/plugins/managelogs/ManageLogProperties.jsp?action=confirmRemoveLogProperties"
+                           class="btn btn-danger btn-sm" title="#i18n{portal.util.labelDelete}" >
+                            #i18n{managelogs.manage_logproperties.delete}
+                        </a>
+                    </#if>
+                </dl>
+            </td>
+        </tr>
+    </@table>
+
+  </@boxBody>
+</@rowBox>

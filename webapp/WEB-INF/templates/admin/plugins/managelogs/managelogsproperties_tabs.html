@@ -1,0 +1,13 @@
+<#macro tabs tab >
+<div>
+    <ul class="nav nav-tabs">
+			<li <#if tab="logproperties">class="active"</#if>>
+				<a href="jsp/admin/plugins/managelogs/ManageLogProperties.jsp">#i18n{managelogs.manage_logproperties.pageTitle}</a>
+			</li>
+		<li <#if tab="download">class="active"</#if>>
+			<a href="jsp/admin/plugins/managelogs/DownloadLog.jsp">#i18n{managelogs.manage_logdownload.pageTitle}</a>
+		</li>
+	</ul>
+</div>
+
+</#macro>
