@@ -17,4 +17,5 @@ First step: Add the right "MANAGELOGS_MANAGEMENT" to your admin user
 Access log managment via System>Manage log
 
 First tab allows you to configure a new log4j properties file or revert to default
-Second tabl allows you to download log files
+
+Second tab allows you to download log files
