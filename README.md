@@ -1,7 +1,7 @@
 # Plugin Manage Logs
 
 ## Introduction
-This plugin allow you to modify log4j configuration on the fly and download log files from within your Lutece back-office.
+This plugin allows you to modify log4j configuration on the fly and download log files from within your Lutece back-office.
 
 ## Configuration
 Edit WEB-INF/conf/override/plugins/managelogs.properties file
