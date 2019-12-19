@@ -102,7 +102,8 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
 
         ReferenceList rf = getLogFilesReferenceList();
 
-        if ( rf.isEmpty() ) {
+        if ( rf.isEmpty() )
+        {
             // no conf found or no log file
             AppLogService.error( "No log file found" );
         }
@@ -112,15 +113,18 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_LOGPROPERTIESS, TEMPLATE_MANAGE_LOGPROPERTIESS, model );
     }
 
-    private static ReferenceList getLogFilesReferenceList() {
+    private static ReferenceList getLogFilesReferenceList()
+    {
         ReferenceList rf = new ReferenceList();
 
         Set<String> setLogFiles = getLogFiles();
 
-        if ( setLogFiles.isEmpty() ) {
+        if ( setLogFiles.isEmpty() )
+        {
             // no conf found or no log file
             AppLogService.error( "No log file found" );
-        } else
+        }
+        else
         {
             // sort files
             List<String> listFilesSorted = new ArrayList<>( setLogFiles );
@@ -141,7 +145,8 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
      * find log configurations and get log files from them
      * @return list of log file names (with path)
      */
-    private static Set<String> getLogFiles() {
+    private static Set<String> getLogFiles()
+    {
         // Using set to avoid duplicates
         Set<String> setLogs = new HashSet<>( );
 
@@ -149,36 +154,33 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
 
         // get log file from log4j configuration
         String log4jConfigFile = System.getProperty( "log4j.configuration" );
-        if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) ) {
+        if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) )
+        {
             setLogs.addAll( readLogConf( log4jConfigFile ) );
         }
 
         // try to find tmp log conf
-        if ( !TMP_LOG_ABSOLUTE.equalsIgnoreCase( log4jConfigFile ) && ManageLogsUtil.isFileReadable( TMP_LOG_ABSOLUTE ) ) {
-            setLogs.addAll( readLogConf( TMP_LOG_ABSOLUTE ) );
-        }
+        setLogs.addAll(getLogsFromFile(TMP_LOG_ABSOLUTE, log4jConfigFile ) );
 
         // try to find log.properties
-        if ( !ALTERNATE_LOG_CONF_FILE_ABSOLUTE.equalsIgnoreCase( log4jConfigFile ) && ManageLogsUtil.isFileReadable( ALTERNATE_LOG_CONF_FILE_ABSOLUTE ) ) {
-            setLogs.addAll( readLogConf( ALTERNATE_LOG_CONF_FILE_ABSOLUTE ) );
-        }
+        setLogs.addAll(getLogsFromFile(ALTERNATE_LOG_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
 
         // try to find config.properties
-        if ( !LUTECE_CONF_FILE_ABSOLUTE.equalsIgnoreCase( log4jConfigFile ) && ManageLogsUtil.isFileReadable( LUTECE_CONF_FILE_ABSOLUTE ) ) {
-            setLogs.addAll( readLogConf( LUTECE_CONF_FILE_ABSOLUTE ) );
-        }
+        setLogs.addAll(getLogsFromFile(LUTECE_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
 
         // additionnal logs defined in managelogs.properties
         String strListAdditionalLogDir = AppPropertiesService.getProperty( "managelogs.addlog.folder" );
-        if ( strListAdditionalLogDir != null ) {
+        if ( strListAdditionalLogDir != null )
+        {
             for ( String logDir : strListAdditionalLogDir.split( ";" ) )
             {
-                if ( !ManageLogsUtil.isNullOrEmptyWithTrim( logDir ))
+                if ( !ManageLogsUtil.isNullOrEmptyWithTrim( logDir ) )
                 {
                     try
                     {
                         setLogs.addAll ( listFilesInDirectory( logDir.trim() ) );
-                    } catch ( IOException e )
+                    }
+                    catch ( IOException e )
                     {
                         AppLogService.error( "Error getting additionnal files from " + logDir, e );
                     }
@@ -189,12 +191,23 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         return setLogs;
     }
 
+    private static Set<String> getLogsFromFile( String file, String log4jConfigFile )
+    {
+        Set<String> setLogs = new HashSet<>( );
+        if ( !file.equalsIgnoreCase( log4jConfigFile ) && ManageLogsUtil.isFileReadable( file ) )
+        {
+            setLogs.addAll( readLogConf( file ) );
+        }
+        return setLogs;
+    }
+
     /**
      * read config file and log files from them
      * @param fileName log configuration file
      * @return list of log file names (with path)
      */
-    private static Set<String> readLogConf( String fileName) {
+    private static Set<String> readLogConf( String fileName)
+    {
         Set<String> logFile = new HashSet<>(  );
         try
         {
@@ -202,20 +215,22 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
 
             List<String> listFilesFromConfiguration = getFilesFromConfiguration( lines, false );
 
-            for ( String fileFromConfiguration : listFilesFromConfiguration ) {
-
+            for ( String fileFromConfiguration : listFilesFromConfiguration )
+            {
                 String absoluteDirectory = Paths.get( fileFromConfiguration ).getParent().toString();
 
                 // listing all files
                 Set<String> filesInDirectory = listFilesInDirectory( absoluteDirectory );
-                for (String strFileInDirectory : filesInDirectory) {
+                for (String strFileInDirectory : filesInDirectory)
+                {
                     // check if the listed file is a derivative of the configured log file (log rotation)
                     if ( Paths.get( strFileInDirectory ).getFileName().toString().startsWith( Paths.get( fileFromConfiguration ).getFileName().toString() ) ) {
                         logFile.add( Paths.get( strFileInDirectory ).toString() );
                     }
                 }
             }
-        } catch ( IOException e )
+        }
+        catch ( IOException e )
         {
             AppLogService.error( "Error reading file " + fileName, e );
         }
@@ -231,7 +246,8 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
      * @return list of files in directory
      * @throws IOException error in reading the directory
      */
-    private static Set<String> listFilesInDirectory(String dir) throws IOException {
+    private static Set<String> listFilesInDirectory(String dir) throws IOException
+    {
         Set<String> fileList = new HashSet<>();
         if ( ManageLogsUtil.isFileReadable( dir ) )
         {
@@ -267,7 +283,8 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         if ( strId == null || Integer.parseInt( strId ) > listRF.size() )
         {
             AppLogService.error( "Error, log number null or invalid" );
-        } else
+        }
+        else
         {
 
             Path path = Paths.get( listRF.get( Integer.parseInt( strId ) ).getName() );

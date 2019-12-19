@@ -40,7 +40,6 @@ import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,6 +51,11 @@ import java.util.List;
  */
 public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBean
 {
+
+    //Constants
+    protected static final String SLASH = "/";
+    protected static final String EMPTY = "";
+
     // Rights
     public static final String RIGHT_MANAGELOGSPROPERTIES = "MANAGELOGS_MANAGEMENT";
     
@@ -60,19 +64,13 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
     protected static final String TMP_LOG_PATH = AppPropertiesService.getProperty( "managelogs.tmp.log.path","/WEB-INF/conf/override/" );
     protected static final String TMP_LOG_FILE_NAME = AppPropertiesService.getProperty( "managelogs.tmp.log.filename","tmp_log.properties" );
     protected static final String TMP_LOG_PATH_ABSOLUTE = getAbsolutePath(TMP_LOG_PATH);
-    protected static final String TMP_LOG_ABSOLUTE = TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith("/") ? "" : "/") + TMP_LOG_FILE_NAME;
+    protected static final String TMP_LOG_ABSOLUTE = TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME;
 
     protected static final String LUTECE_LOG_PATH = AppPropertiesService.getProperty( "managelogs.lutece.log.path","/WEB-INF/conf/" );
     protected static final String LUTECE_LOG_FILE = AppPropertiesService.getProperty( "managelogs.lutecec.log.file","config.properties" );
 
-    protected static final String ALTERNATE_LOG_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( "/" ) ? "" : "/" ) + "override/" + "log.properties" );
-    protected static final String LUTECE_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( "/" ) ? "" : "/" ) + LUTECE_LOG_FILE );
-
-    // Parameters
-    
-    // Markers
-
-    //Variables
+    protected static final String ALTERNATE_LOG_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + "override/" + "log.properties" );
+    protected static final String LUTECE_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + LUTECE_LOG_FILE );
 
     private static List<String> _listLogFoldersAllowed = new ArrayList<>(  );
 
@@ -113,26 +111,29 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
      */
     protected static List<String> getFilesFromConfiguration( List<String> lines, boolean throwExceptionOnInaccessibleFile ) throws AccessDeniedException
     {
-        List<String> listConfiguredFiles = new ArrayList<>(  );
-        if ( lines != null )
+        if ( lines == null )
         {
-            for ( String line : lines )
+            return new ArrayList<>(  );
+        }
+
+        List<String> listConfiguredFiles = new ArrayList<>(  );
+        for ( String line : lines )
+        {
+            // check if line is valid (key=value) and not comment
+            if ( !ManageLogsUtil.isNullOrEmptyWithTrim( line ) && !line.trim().startsWith( "#" ) && line.split( "=" ).length == 2 && line.contains( ".File=" ) )
             {
-                // check if line is valid (key=value) and not comment
-                if ( !ManageLogsUtil.isNullOrEmptyWithTrim( line ) && !line.trim().startsWith( "#" ) && line.split( "=" ).length == 2 && line.contains( ".File=" ) )
+                String fileName = line.split( "=" )[ 1 ];
+                String strParentAbsoluteDirectory = Paths.get( getAbsolutePath( fileName.replaceAll( "\r",EMPTY ) ) ).getParent( ).toString( );
+                if ( isLogFileAccessible( strParentAbsoluteDirectory ) )
                 {
-                    String fileName = line.split( "=" )[ 1 ];
-                    String strParentAbsoluteDirectory = Paths.get( getAbsolutePath( fileName.replaceAll( "\r","" ) ) ).getParent( ).toString( );
-                    if ( isLogFileAccessible( strParentAbsoluteDirectory ) )
+                    listConfiguredFiles.add( fileName );
+                }
+                else
+                {
+                    AppLogService.debug( "File " + fileName + " inaccessible" );
+                    if ( throwExceptionOnInaccessibleFile )
                     {
-                        listConfiguredFiles.add( fileName );
-                    } else
-                    {
-                        AppLogService.debug( "File " + fileName + " inaccessible" );
-                        if ( throwExceptionOnInaccessibleFile )
-                        {
-                            throw new AccessDeniedException( "Folder " + strParentAbsoluteDirectory + " is denied (check 'limit.folder' configuration" );
-                        }
+                        throw new AccessDeniedException( "Folder " + strParentAbsoluteDirectory + " is denied (check 'limit.folder' configuration" );
                     }
                 }
             }

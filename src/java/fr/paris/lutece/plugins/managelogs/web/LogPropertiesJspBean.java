@@ -108,6 +108,9 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
 
     // Session variable to store working values
     private LogProperties _logproperties;
+
+    //Constants
+    private static final String LOG_CONF_CHANGE =    "Log configuration changed to use ";
     
     /**
      * Build the Manage View
@@ -125,7 +128,9 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
         {
             _logproperties.setCurrentProperties( getTmpLogFileContent() );
             model.put( MARK_TMP_LOG_EXISTS, "true" );
-        } else {
+        }
+        else
+        {
             _logproperties.setCurrentProperties( StringUtils.EMPTY );
             model.put( MARK_TMP_LOG_EXISTS, "false" );
         }
@@ -133,13 +138,17 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
 
         // get currently used log configuration file
         String log4jConfigFile = System.getProperty( "log4j.configuration" );
-        if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) ) {
+        if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) )
+        {
             model.put( MARK_LOG_CONF_IN_USE, log4jConfigFile );
 
             // check whether tmp conf file is used
-            if (log4jConfigFile.equalsIgnoreCase( TMP_LOG_ABSOLUTE )) {
+            if (log4jConfigFile.equalsIgnoreCase( TMP_LOG_ABSOLUTE ))
+            {
                 model.put( MARK_TMP_LOG_USED, "true" );
-            } else {
+            }
+            else
+            {
                 model.put( MARK_TMP_LOG_USED, "false" );
             }
         }
@@ -167,7 +176,9 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
             if ( !Files.isReadable( Paths.get( TMP_LOG_ABSOLUTE ) ) )
             {
                 _logproperties.setCurrentProperties( StringUtils.EMPTY );
-            } else {
+            }
+            else
+            {
                 _logproperties.setCurrentProperties( getTmpLogFileContent() );
             }
         }
@@ -203,7 +214,8 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
             try
             {
                 getFilesFromConfiguration( Arrays.asList( _logproperties.getCurrentProperties( ).split( "\n" ) ), true);
-            } catch ( AccessDeniedException e )
+            }
+            catch ( AccessDeniedException e )
             {
                 // one or more file appender is writing to a non allowed folder
                 addError( ERROR_LOGPROPERTIES_CONF_ERROR, request.getLocale() );
@@ -221,13 +233,15 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
 
             // reload log4j file
             AppLogService.init( TMP_LOG_PATH, TMP_LOG_FILE_NAME );
-            AppLogService.info( "Log configuration changed to use " + TMP_LOG_PATH + ( TMP_LOG_PATH.endsWith( "/" ) ? "" : "/" ) + TMP_LOG_FILE_NAME );
-        } else {
+            AppLogService.info( LOG_CONF_CHANGE + TMP_LOG_PATH + ( TMP_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME );
+        }
+        else
+        {
             // Use standard Lutece log file
             deleteTempLogConfFile( request );
             // reload log4j file
             AppLogService.init( LUTECE_LOG_PATH, LUTECE_LOG_FILE );
-            AppLogService.info( "Log configuration changed to use " + LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( "/" ) ? "" : "/" ) + LUTECE_LOG_FILE );
+            AppLogService.info( LOG_CONF_CHANGE + LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + LUTECE_LOG_FILE );
         }
 
         addInfo( INFO_LOGPROPERTIES_UPDATED, getLocale(  ) );
@@ -264,7 +278,7 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
         deleteTempLogConfFile( request );
         // reload log4j file
         AppLogService.init( LUTECE_LOG_PATH, LUTECE_LOG_FILE );
-        AppLogService.info( "Log configuration changed to use " + LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( "/" ) ? "" : "/" ) + LUTECE_LOG_FILE );
+        AppLogService.info( LOG_CONF_CHANGE + LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + LUTECE_LOG_FILE );
 
         addInfo( INFO_LOGPROPERTIES_REMOVED, getLocale(  ) );
 
@@ -282,10 +296,11 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
         {
             // no option to write method means CREATE, TRUNCATE_EXISTING, and WRITE
             Files.write( Paths.get( TMP_LOG_ABSOLUTE ), _logproperties.getCurrentProperties( ).getBytes( Charset.defaultCharset() ) );
-        } catch ( IOException e )
+        }
+        catch ( IOException e )
         {
             // Error when file not writable. Eg.: path does not exists
-            AppLogService.error( "Error writing file: " + TMP_LOG_PATH + ( TMP_LOG_PATH.endsWith( "/" ) ? "" : "/" ) + TMP_LOG_FILE_NAME, e );
+            AppLogService.error( "Error writing file: " + TMP_LOG_PATH + ( TMP_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME, e );
             addError( ERROR_LOGPROPERTIES_WRITE , request.getLocale() );
 
             throw e;
@@ -296,31 +311,35 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
      * Delete the temporary log configuration
      * @param request The Http request
      */
-    private void deleteTempLogConfFile( HttpServletRequest request ) {
+    private void deleteTempLogConfFile( HttpServletRequest request )
+    {
         try
         {
             String strAbsoluteConfigDirectoryPath = AppPathService.getAbsolutePathFromRelativePath(TMP_LOG_PATH);
-            Files.deleteIfExists(  Paths.get(strAbsoluteConfigDirectoryPath + (strAbsoluteConfigDirectoryPath.endsWith("/") ? "" : "/") + TMP_LOG_FILE_NAME) );
-        } catch ( IOException e )
+            Files.deleteIfExists(  Paths.get(strAbsoluteConfigDirectoryPath + (strAbsoluteConfigDirectoryPath.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME) );
+        }
+        catch ( IOException e )
         {
-            AppLogService.error( "Error deleting file: " + TMP_LOG_PATH + ( TMP_LOG_PATH.endsWith( "/" ) ? "" : "/" ) + TMP_LOG_FILE_NAME, e );
+            AppLogService.error( "Error deleting file: " + TMP_LOG_PATH + ( TMP_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME, e );
             addError( ERROR_LOGPROPERTIES_DELETE, request.getLocale() );
         }
     }
 
-    private String getTmpLogFileContent() {
+    private String getTmpLogFileContent()
+    {
         String retour = StringUtils.EMPTY;
 
         List<String> lines;
         try
         {
-            lines = Files.readAllLines( Paths.get( TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith("/") ? "" : "/") + TMP_LOG_FILE_NAME), Charset.defaultCharset( ) );
+            lines = Files.readAllLines( Paths.get( TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME), Charset.defaultCharset( ) );
             StringBuilder properties = new StringBuilder( StringUtils.EMPTY );
             for ( String line: lines ) {
                 properties.append( "\n" ).append( line );
             }
             retour = properties.toString();
-        } catch ( IOException e )
+        }
+        catch ( IOException e )
         {
             AppLogService.error( "Error reading " + TMP_LOG_FILE_NAME, e );
         }
