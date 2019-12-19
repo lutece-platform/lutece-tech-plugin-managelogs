@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<plug-in>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><plug-in>
     <name>managelogs</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <documentation>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</documentation>
     <installation>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</installation>
     <changes>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</changes>
@@ -27,7 +26,7 @@
             <feature-description>managelogs.adminFeature.ManageLogsProperties.description</feature-description>
             <feature-level>0</feature-level>
             <feature-url>jsp/admin/plugins/managelogs/ManageLogProperties.jsp</feature-url>
-            <feature-icon-url></feature-icon-url>
+            <feature-icon-url/>
       </admin-feature>
     </admin-features>
 
