@@ -3,15 +3,15 @@
     <name>managelogs</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
     <version>1.0.0-SNAPSHOT</version>
-    <documentation></documentation>
-    <installation></installation>
-    <changes></changes>
-    <user-guide></user-guide>
+    <documentation>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</documentation>
+    <installation>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</installation>
+    <changes>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</changes>
+    <user-guide>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</user-guide>
     <description>managelogs.plugin.description</description>
     <provider>managelogs.plugin.provider</provider>
-    <provider-url>https://www.accenture.com/</provider-url>
+    <provider-url>http://lutece.paris.fr/</provider-url>
     <icon-url>images/admin/skin/feature_default_icon.png</icon-url>
-    <copyright>Copyright (c) 2019 Accenture</copyright>
+    <copyright>Copyright (c) 2019 Mairie de Paris</copyright>
     <db-pool-required>0</db-pool-required>
     
     <core-version-dependency>

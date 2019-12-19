@@ -7,7 +7,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.paris.lutece.plugins</groupId>
-        <artifactId>plugin-managelogs</artifactId>
+    <artifactId>plugin-managelogs</artifactId>
     <packaging>lutece-plugin</packaging>
     <version>1.0.0-SNAPSHOT</version>
     <name>Lutece managelogs plugin</name>
@@ -47,4 +47,11 @@
         <jiraProjectName>MANAGELOGS</jiraProjectName>
         <jiraComponentId></jiraComponentId>
     </properties>
+
+    <scm>
+        <connection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</developerConnection>
+        <url>https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</url>
+        <tag>plugin-managelogs-1.0.0</tag>
+    </scm>
 </project>
