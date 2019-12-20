@@ -22,16 +22,16 @@ First tab allows you to configure a new log4j properties file or revert to defau
 
 Second tab allows you to download log files
 
-###Additional information
+### Additional information
 Minimum Lutece version is 5.0.1 with java 7
 
 ## French version
 
-###Introduction
+### Introduction
 Le plugin permet de modifier la configuration log4j à chaud et de télécharger l'ensemble des logs de l'application (Lutece + tomcat) via le BO Lutece.
 
 
-###Installation
+### Installation
 Ajouter la dépendance suivante au pom.xml du site Lutece :
 
 &lt;dependency&gt;<br>
@@ -41,7 +41,7 @@ Ajouter la dépendance suivante au pom.xml du site Lutece :
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;type&gt;lutece-plugin&lt;/type&gt;<br>
 &lt;/dependency&gt;
 
-###Configuration
+### Configuration
 Surcharger dans le répertoire "WEB-INF/conf/override" le fichier managelogs.properties
 
 Les deux variables à minima à surcharger sont "managelogs.limit.folder" et "managelogs.addlog.folder"
@@ -56,7 +56,7 @@ Définition des variables (tous les chemins peuvent être absolus ou relatifs) :
 <li>managelogs.addlog.folder : permet d'ajouter des répertoires complémentaires (par exemple répertoire de log tomcat) pour télécharger les fichiers. Liste de répertoires séparés par ';'</li>
 </ul>
 
-###Utilisation
+### Utilisation
 1) Activer le plugin dans la gestion des plugins du BO Lutece
 
 2) Ajouter le droit "Manage Logs Properties (Niveau 0) - Manage log4j properties" à l'utilisateur d'administration qui devra être habilité
@@ -71,7 +71,7 @@ Attention la surchage log4j doit contenir l'ensemble de la configuration log4j v
 Le deuxième onglet remonte les fichiers de log définis dans la configuration log4j ainsi que les fichiers définis par la variable managelogs.addlog.folder du plugin.
 
 
-###Informations complémentaires
+### Informations complémentaires
 Le code du plugin est disponible sur github: https://github.com/lutece-platform/lutece-tech-plugin-managelogs
 
 La version minimum de Lutece supportée est la 5.0.1 (java 7)
