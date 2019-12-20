@@ -22,6 +22,9 @@ First tab allows you to configure a new log4j properties file or revert to defau
 
 Second tab allows you to download log files
 
+###Additional information
+Minimum Lutece version is 5.0.1 with java 7
+
 ## French version
 
 ###Introduction
@@ -71,4 +74,4 @@ Le deuxième onglet remonte les fichiers de log définis dans la configuration log
 ###Informations complémentaires
 Le code du plugin est disponible sur github: https://github.com/lutece-platform/lutece-tech-plugin-managelogs
 
-La version minimum de Lutece supportée est la 5.0.1
+La version minimum de Lutece supportée est la 5.0.1 (java 7)
