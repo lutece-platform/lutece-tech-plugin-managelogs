@@ -151,12 +151,16 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         Set<String> setLogs = new HashSet<>( );
 
         // STEP 1: get all configuration and log files
+        String log4jConfigFile = null;
 
         // get log file from log4j configuration
-        String log4jConfigFile = System.getProperty( "log4j.configuration" );
-        if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) )
+        if (!APP_SERVER_MULTI_WEBAPP)
         {
-            setLogs.addAll( readLogConf( log4jConfigFile ) );
+            log4jConfigFile = System.getProperty( "log4j.configuration" );
+            if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) )
+            {
+                setLogs.addAll( readLogConf( log4jConfigFile ) );
+            }
         }
 
         // try to find tmp log conf

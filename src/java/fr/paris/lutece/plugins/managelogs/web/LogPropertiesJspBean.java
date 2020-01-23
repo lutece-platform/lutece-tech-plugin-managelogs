@@ -137,13 +137,18 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
         _logproperties.setDefaultProperties( "# insert log4j property values here #" );
 
         // get currently used log configuration file
-        String log4jConfigFile = System.getProperty( "log4j.configuration" );
+        String log4jConfigFile = null;
+        if (!APP_SERVER_MULTI_WEBAPP)
+        {
+            log4jConfigFile = System.getProperty( "log4j.configuration" );
+        }
+
         if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) )
         {
             model.put( MARK_LOG_CONF_IN_USE, log4jConfigFile );
 
             // check whether tmp conf file is used
-            if (log4jConfigFile.equalsIgnoreCase( TMP_LOG_ABSOLUTE ))
+            if (TMP_LOG_ABSOLUTE.equalsIgnoreCase( log4jConfigFile ))
             {
                 model.put( MARK_TMP_LOG_USED, "true" );
             }
@@ -151,6 +156,11 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
             {
                 model.put( MARK_TMP_LOG_USED, "false" );
             }
+        }
+        else
+        {
+            model.put( MARK_LOG_CONF_IN_USE, "Undefined" );
+            model.put( MARK_TMP_LOG_USED, "Undefined" );
         }
 
 

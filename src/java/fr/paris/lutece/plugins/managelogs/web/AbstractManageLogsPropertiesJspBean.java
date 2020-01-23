@@ -72,6 +72,8 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
     protected static final String ALTERNATE_LOG_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + "override/" + "log.properties" );
     protected static final String LUTECE_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + LUTECE_LOG_FILE );
 
+    protected static final boolean APP_SERVER_MULTI_WEBAPP = AppPropertiesService.getPropertyBoolean( "managelogs.is.multi.webapp", false );
+
     private static List<String> _listLogFoldersAllowed = new ArrayList<>(  );
 
     static
@@ -100,7 +102,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
             return strPath;
         } else {
             // relative
-            return AppPathService.getAbsolutePathFromRelativePath(strPath);
+            return AppPathService.getAbsolutePathFromRelativePath(( strPath.startsWith(SLASH) ? EMPTY : SLASH) + strPath);
         }
     }
 
