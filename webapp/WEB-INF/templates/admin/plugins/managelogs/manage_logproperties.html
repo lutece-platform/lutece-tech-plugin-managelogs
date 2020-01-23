@@ -33,15 +33,18 @@
                     </#if>
                     </dt>
 
-                    <br>
-
-                    <dt>#i18n{managelogs.manage_logproperties.tmplog.used}
-                    <#if tmplogused! == 'true' >
-                        <em class="glyphicon glyphicon-ok bg-green">#i18n{managelogs.manage_logproperties.yes}</em>
+                    <#if tmplogused! == 'true' || tmplogused! == 'false'>
+                        <br>
+                        <dt>#i18n{managelogs.manage_logproperties.tmplog.used}
+                            <#if tmplogused! == 'true' >
+                                <em class="glyphicon glyphicon-ok bg-green">#i18n{managelogs.manage_logproperties.yes}</em>
+                            <#else>
+                                <em class="glyphicon glyphicon-remove bg-red">#i18n{managelogs.manage_logproperties.no}</em>
+                            </#if>
+                        </dt>
                     <#else>
-                        <em class="glyphicon glyphicon-remove bg-red">#i18n{managelogs.manage_logproperties.no}</em>
+                     <!-- multi webapp, System.getProperty( "log4j.configuration" ) unreliable -->
                     </#if>
-                    </dt>
 
                     <br>
 

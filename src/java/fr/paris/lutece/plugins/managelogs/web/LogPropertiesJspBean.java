@@ -325,12 +325,16 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
     {
         try
         {
-            String strAbsoluteConfigDirectoryPath = AppPathService.getAbsolutePathFromRelativePath(TMP_LOG_PATH);
-            Files.deleteIfExists(  Paths.get(strAbsoluteConfigDirectoryPath + (strAbsoluteConfigDirectoryPath.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME) );
+            boolean isDeleted = Files.deleteIfExists(  Paths.get(TMP_LOG_PATH_ABSOLUTE + (TMP_LOG_PATH_ABSOLUTE.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME) );
+            if (!isDeleted)
+            {
+                AppLogService.error( "Error deleting file: " + TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME );
+                addError( ERROR_LOGPROPERTIES_DELETE, request.getLocale() );
+            }
         }
         catch ( IOException e )
         {
-            AppLogService.error( "Error deleting file: " + TMP_LOG_PATH + ( TMP_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME, e );
+            AppLogService.error( "Error deleting file: " + TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME, e );
             addError( ERROR_LOGPROPERTIES_DELETE, request.getLocale() );
         }
     }

@@ -61,12 +61,12 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
     
     // Properties
 
-    protected static final String TMP_LOG_PATH = AppPropertiesService.getProperty( "managelogs.tmp.log.path","/WEB-INF/conf/override/" );
+    protected static final String TMP_LOG_PATH = AppPropertiesService.getProperty( "managelogs.tmp.log.path","WEB-INF/conf/override/" );
     protected static final String TMP_LOG_FILE_NAME = AppPropertiesService.getProperty( "managelogs.tmp.log.filename","tmp_log.properties" );
     protected static final String TMP_LOG_PATH_ABSOLUTE = getAbsolutePath(TMP_LOG_PATH);
     protected static final String TMP_LOG_ABSOLUTE = TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME;
 
-    protected static final String LUTECE_LOG_PATH = AppPropertiesService.getProperty( "managelogs.lutece.log.path","/WEB-INF/conf/" );
+    protected static final String LUTECE_LOG_PATH = AppPropertiesService.getProperty( "managelogs.lutece.log.path","WEB-INF/conf/" );
     protected static final String LUTECE_LOG_FILE = AppPropertiesService.getProperty( "managelogs.lutecec.log.file","config.properties" );
 
     protected static final String ALTERNATE_LOG_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + "override/" + "log.properties" );
