@@ -48,6 +48,27 @@
         <jiraComponentId />
     </properties>
 
+    <profiles>
+        <profile>
+            <id>lutece-test-hsql</id>
+            <activation>
+                <property>
+                    <name>lutece-test-hsql</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>2.3.4</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <antrun-lutece-db-properties>db-test-hsql.properties</antrun-lutece-db-properties>
+            </properties>
+        </profile>
+    </profiles>
+
     <scm>
         <connection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</developerConnection>
