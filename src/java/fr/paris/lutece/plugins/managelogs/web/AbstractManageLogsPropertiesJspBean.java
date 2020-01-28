@@ -51,7 +51,6 @@ import java.util.List;
  */
 public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBean
 {
-
     //Constants
     protected static final String SLASH = "/";
     protected static final String EMPTY = "";
@@ -61,13 +60,13 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
     
     // Properties
 
-    protected static final String TMP_LOG_PATH = AppPropertiesService.getProperty( "managelogs.tmp.log.path","WEB-INF/conf/override/" );
-    protected static final String TMP_LOG_FILE_NAME = AppPropertiesService.getProperty( "managelogs.tmp.log.filename","tmp_log.properties" );
-    protected static final String TMP_LOG_PATH_ABSOLUTE = getAbsolutePath(TMP_LOG_PATH);
-    protected static final String TMP_LOG_ABSOLUTE = TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME;
+    protected static final String TMP_LOG_PATH = AppPropertiesService.getProperty( "managelogs.tmp.log.path", "WEB-INF/conf/override/" );
+    protected static final String TMP_LOG_FILE_NAME = AppPropertiesService.getProperty( "managelogs.tmp.log.filename", "tmp_log.properties" );
+    protected static final String TMP_LOG_PATH_ABSOLUTE = getAbsolutePath(TMP_LOG_PATH );
+    protected static final String TMP_LOG_ABSOLUTE = TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME;
 
-    protected static final String LUTECE_LOG_PATH = AppPropertiesService.getProperty( "managelogs.lutece.log.path","WEB-INF/conf/" );
-    protected static final String LUTECE_LOG_FILE = AppPropertiesService.getProperty( "managelogs.lutecec.log.file","config.properties" );
+    protected static final String LUTECE_LOG_PATH = AppPropertiesService.getProperty( "managelogs.lutece.log.path", "WEB-INF/conf/" );
+    protected static final String LUTECE_LOG_FILE = AppPropertiesService.getProperty( "managelogs.lutecec.log.file", "config.properties" );
 
     protected static final String ALTERNATE_LOG_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + "override/" + "log.properties" );
     protected static final String LUTECE_CONF_FILE_ABSOLUTE = getAbsolutePath( LUTECE_LOG_PATH + ( LUTECE_LOG_PATH.endsWith( SLASH ) ? EMPTY : SLASH ) + LUTECE_LOG_FILE );
@@ -80,10 +79,13 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
     {
         // add path
         String strListFoldersRelative = AppPropertiesService.getProperty( "managelogs.limit.folder" );
-        if (strListFoldersRelative!=null) {
+        if ( strListFoldersRelative != null )
+        {
             String[] arrFoldersRelative = strListFoldersRelative.split( ";" );
-            for (String relativeFolder : arrFoldersRelative) {
-                if (  !ManageLogsUtil.isNullOrEmptyWithTrim( relativeFolder ) ) {
+            for (String relativeFolder : arrFoldersRelative)
+            {
+                if ( !ManageLogsUtil.isNullOrEmptyWithTrim( relativeFolder ) )
+                {
                     _listLogFoldersAllowed.add( getAbsolutePath( relativeFolder ) );
                 }
             }
@@ -96,13 +98,17 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
      * @param strPath the path
      * @return the absolute path
      */
-    protected static String getAbsolutePath(String strPath) {
+    protected static String getAbsolutePath(String strPath)
+    {
         Path path = Paths.get( strPath );
-        if (path.isAbsolute()) {
+        if ( path.isAbsolute( ) )
+        {
             return strPath;
-        } else {
+        }
+        else
+        {
             // relative
-            return AppPathService.getAbsolutePathFromRelativePath(( strPath.startsWith(SLASH) ? EMPTY : SLASH) + strPath);
+            return AppPathService.getAbsolutePathFromRelativePath(( strPath.startsWith(SLASH) ? EMPTY : SLASH ) + strPath );
         }
     }
 
@@ -122,7 +128,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
         for ( String line : lines )
         {
             // check if line is valid (key=value) and not comment
-            if ( !ManageLogsUtil.isNullOrEmptyWithTrim( line ) && !line.trim().startsWith( "#" ) && line.split( "=" ).length == 2 && line.contains( ".File=" ) )
+            if ( !ManageLogsUtil.isNullOrEmptyWithTrim( line ) && !line.trim( ).startsWith( "#" ) && line.split( "=" ).length == 2 && line.contains( ".File=" ) )
             {
                 String fileName = line.split( "=" )[ 1 ];
                 String strParentAbsoluteDirectory = Paths.get( getAbsolutePath( fileName.replaceAll( "\r",EMPTY ) ) ).getParent( ).toString( );
@@ -149,7 +155,8 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
      * @param file the file to check
      * @return the check result
      */
-    protected static boolean isLogFileAccessible(String file) {
+    protected static boolean isLogFileAccessible(String file)
+    {
         if ( ManageLogsUtil.isNullOrEmptyWithTrim( file ) )
         {
             return false;
@@ -158,7 +165,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
         boolean bIsFileOK = false;
 
         // check if the file is in an allowed folder (or sub-folder)
-        for (String strValidFolder : _listLogFoldersAllowed)
+        for ( String strValidFolder : _listLogFoldersAllowed )
         {
             if ( !ManageLogsUtil.isNullOrEmptyWithTrim( strValidFolder ) &&  Paths.get( file.trim() ).startsWith( Paths.get( strValidFolder.trim() ) ) )
             {

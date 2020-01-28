@@ -37,7 +37,6 @@ package fr.paris.lutece.plugins.managelogs.web;
 import fr.paris.lutece.plugins.managelogs.business.LogProperties;
 import fr.paris.lutece.plugins.managelogs.util.ManageLogsUtil;
 import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
@@ -65,6 +64,8 @@ import static fr.paris.lutece.plugins.managelogs.web.AbstractManageLogsPropertie
 @Controller( controllerJsp = "ManageLogProperties.jsp", controllerPath = "jsp/admin/plugins/managelogs/", right = RIGHT_MANAGELOGSPROPERTIES)
 public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
 {
+    static final long serialVersionUID = -1;
+
     // Templates
     private static final String TEMPLATE_MANAGE_LOGPROPERTIES = "/admin/plugins/managelogs/manage_logproperties.html";
     private static final String TEMPLATE_MODIFY_LOGPROPERTIES = "/admin/plugins/managelogs/modify_logproperties.html";
@@ -236,7 +237,8 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
             try
             {
                 createTempLogConfFile( request );
-            } catch ( IOException e )
+            }
+            catch ( IOException e )
             {
                 return redirect( request, VIEW_MODIFY_LOGPROPERTIES, PARAMETER_ID_LOGPROPERTIES, _logproperties.getId( ) );
             }
@@ -348,7 +350,8 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
         {
             lines = Files.readAllLines( Paths.get( TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME), Charset.defaultCharset( ) );
             StringBuilder properties = new StringBuilder( StringUtils.EMPTY );
-            for ( String line: lines ) {
+            for ( String line: lines )
+            {
                 properties.append( "\n" ).append( line );
             }
             retour = properties.toString();

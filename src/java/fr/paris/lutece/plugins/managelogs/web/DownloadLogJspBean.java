@@ -59,6 +59,8 @@ import static fr.paris.lutece.plugins.managelogs.web.AbstractManageLogsPropertie
 @Controller( controllerJsp = "DownloadLog.jsp", controllerPath = "jsp/admin/plugins/managelogs/", right = RIGHT_MANAGELOGSPROPERTIES )
 public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
 {
+    static final long serialVersionUID = -1;
+    
     // Templates
     private static final String TEMPLATE_MANAGE_LOGPROPERTIESS = "/admin/plugins/managelogs/download_logs.html";
 
@@ -154,7 +156,7 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         String log4jConfigFile = null;
 
         // get log file from log4j configuration
-        if (!APP_SERVER_MULTI_WEBAPP)
+        if ( !APP_SERVER_MULTI_WEBAPP )
         {
             log4jConfigFile = System.getProperty( "log4j.configuration" );
             if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) )
@@ -228,7 +230,8 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
                 for (String strFileInDirectory : filesInDirectory)
                 {
                     // check if the listed file is a derivative of the configured log file (log rotation)
-                    if ( Paths.get( strFileInDirectory ).getFileName().toString().startsWith( Paths.get( fileFromConfiguration ).getFileName().toString() ) ) {
+                    if ( Paths.get( strFileInDirectory ).getFileName().toString().startsWith( Paths.get( fileFromConfiguration ).getFileName().toString() ) )
+                    {
                         logFile.add( Paths.get( strFileInDirectory ).toString() );
                     }
                 }
@@ -296,7 +299,8 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
             try
             {
                 download( Files.readAllBytes( path ), path.getFileName().toString(), CONTENT_TYPE );
-            } catch ( IOException e )
+            }
+            catch ( IOException e )
             {
                 AppLogService.error( "Error downloading file", e );
             }

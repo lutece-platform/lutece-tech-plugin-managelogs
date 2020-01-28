@@ -39,7 +39,8 @@ import java.nio.file.Paths;
 
 public class ManageLogsUtil
 {
-    private ManageLogsUtil( ) {
+    private ManageLogsUtil( )
+    {
 
     }
 
@@ -58,7 +59,8 @@ public class ManageLogsUtil
      * @param strFile absolute path
      * @return result of check
      */
-    public static boolean isFileReadable( String strFile ) {
+    public static boolean isFileReadable( String strFile )
+    {
         return !isNullOrEmptyWithTrim( strFile ) && Files.isReadable( Paths.get ( strFile ) );
     }
 }
