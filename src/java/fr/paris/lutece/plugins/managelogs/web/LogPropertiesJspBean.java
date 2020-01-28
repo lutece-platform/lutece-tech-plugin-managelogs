@@ -61,7 +61,7 @@ import static fr.paris.lutece.plugins.managelogs.web.AbstractManageLogsPropertie
 /**
  * This class provides the user interface to manage LogProperties features ( manage, modify )
  */
-@Controller( controllerJsp = "ManageLogProperties.jsp", controllerPath = "jsp/admin/plugins/managelogs/", right = RIGHT_MANAGELOGSPROPERTIES)
+@Controller( controllerJsp = "ManageLogProperties.jsp", controllerPath = "jsp/admin/plugins/managelogs/", right = RIGHT_MANAGELOGSPROPERTIES )
 public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
 {
     static final long serialVersionUID = -1;
@@ -139,7 +139,7 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
 
         // get currently used log configuration file
         String log4jConfigFile = null;
-        if (!APP_SERVER_MULTI_WEBAPP)
+        if ( !APP_SERVER_MULTI_WEBAPP )
         {
             log4jConfigFile = System.getProperty( "log4j.configuration" );
         }
@@ -149,7 +149,7 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
             model.put( MARK_LOG_CONF_IN_USE, log4jConfigFile );
 
             // check whether tmp conf file is used
-            if (TMP_LOG_ABSOLUTE.equalsIgnoreCase( log4jConfigFile ))
+            if ( TMP_LOG_ABSOLUTE.equalsIgnoreCase( log4jConfigFile ) )
             {
                 model.put( MARK_TMP_LOG_USED, "true" );
             }
@@ -219,12 +219,12 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
             return redirect( request, VIEW_MODIFY_LOGPROPERTIES, PARAMETER_ID_LOGPROPERTIES, _logproperties.getId( ) );
         }
 
-        if (_logproperties.getCurrentProperties()!=null && !_logproperties.getCurrentProperties().trim().isEmpty())
+        if ( _logproperties.getCurrentProperties()!=null && !_logproperties.getCurrentProperties().trim().isEmpty( ) )
         {
             // Check if path in the new configuration is in one of the right folder
             try
             {
-                getFilesFromConfiguration( Arrays.asList( _logproperties.getCurrentProperties( ).split( "\n" ) ), true);
+                getFilesFromConfiguration( Arrays.asList( _logproperties.getCurrentProperties( ).split( "\n" ) ), true );
             }
             catch ( AccessDeniedException e )
             {
@@ -348,7 +348,7 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
         List<String> lines;
         try
         {
-            lines = Files.readAllLines( Paths.get( TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME ), Charset.defaultCharset( ) );
+            lines = Files.readAllLines( Paths.get( TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME ), Charset.defaultCharset( ) );
             StringBuilder properties = new StringBuilder( StringUtils.EMPTY );
             for ( String line: lines )
             {

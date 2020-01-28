@@ -100,7 +100,7 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
     @View( value = VIEW_DEFAULT, defaultView = true )
     public String getLogs( HttpServletRequest request )
     {
-        Map<String,Object> model = new HashMap<>(  );
+        Map<String, Object> model = new HashMap<>(  );
 
         ReferenceList rf = getLogFilesReferenceList();
 
@@ -166,13 +166,13 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         }
 
         // try to find tmp log conf
-        setLogs.addAll(getLogsFromFile(TMP_LOG_ABSOLUTE, log4jConfigFile ) );
+        setLogs.addAll( getLogsFromFile(TMP_LOG_ABSOLUTE, log4jConfigFile ) );
 
         // try to find log.properties
-        setLogs.addAll(getLogsFromFile(ALTERNATE_LOG_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
+        setLogs.addAll( getLogsFromFile(ALTERNATE_LOG_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
 
         // try to find config.properties
-        setLogs.addAll(getLogsFromFile(LUTECE_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
+        setLogs.addAll( getLogsFromFile(LUTECE_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
 
         // additionnal logs defined in managelogs.properties
         String strListAdditionalLogDir = AppPropertiesService.getProperty( "managelogs.addlog.folder" );
@@ -212,7 +212,7 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
      * @param fileName log configuration file
      * @return list of log file names (with path)
      */
-    private static Set<String> readLogConf( String fileName)
+    private static Set<String> readLogConf( String fileName )
     {
         Set<String> logFile = new HashSet<>(  );
         try
@@ -227,7 +227,7 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
 
                 // listing all files
                 Set<String> filesInDirectory = listFilesInDirectory( absoluteDirectory );
-                for (String strFileInDirectory : filesInDirectory)
+                for ( String strFileInDirectory : filesInDirectory )
                 {
                     // check if the listed file is a derivative of the configured log file (log rotation)
                     if ( Paths.get( strFileInDirectory ).getFileName().toString().startsWith( Paths.get( fileFromConfiguration ).getFileName().toString() ) )
@@ -253,7 +253,7 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
      * @return list of files in directory
      * @throws IOException error in reading the directory
      */
-    private static Set<String> listFilesInDirectory(String dir) throws IOException
+    private static Set<String> listFilesInDirectory( String dir ) throws IOException
     {
         Set<String> fileList = new HashSet<>();
         if ( ManageLogsUtil.isFileReadable( dir ) )

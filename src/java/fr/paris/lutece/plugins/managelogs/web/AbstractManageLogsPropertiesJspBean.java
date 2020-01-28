@@ -155,7 +155,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
      * @param file the file to check
      * @return the check result
      */
-    protected static boolean isLogFileAccessible(String file)
+    protected static boolean isLogFileAccessible( String file )
     {
         if ( ManageLogsUtil.isNullOrEmptyWithTrim( file ) )
         {
