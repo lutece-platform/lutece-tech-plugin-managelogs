@@ -62,7 +62,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
 
     protected static final String TMP_LOG_PATH = AppPropertiesService.getProperty( "managelogs.tmp.log.path", "WEB-INF/conf/override/" );
     protected static final String TMP_LOG_FILE_NAME = AppPropertiesService.getProperty( "managelogs.tmp.log.filename", "tmp_log.properties" );
-    protected static final String TMP_LOG_PATH_ABSOLUTE = getAbsolutePath(TMP_LOG_PATH );
+    protected static final String TMP_LOG_PATH_ABSOLUTE = getAbsolutePath( TMP_LOG_PATH );
     protected static final String TMP_LOG_ABSOLUTE = TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME;
 
     protected static final String LUTECE_LOG_PATH = AppPropertiesService.getProperty( "managelogs.lutece.log.path", "WEB-INF/conf/" );
@@ -82,7 +82,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
         if ( strListFoldersRelative != null )
         {
             String[] arrFoldersRelative = strListFoldersRelative.split( ";" );
-            for (String relativeFolder : arrFoldersRelative)
+            for ( String relativeFolder : arrFoldersRelative )
             {
                 if ( !ManageLogsUtil.isNullOrEmptyWithTrim( relativeFolder ) )
                 {
@@ -98,7 +98,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
      * @param strPath the path
      * @return the absolute path
      */
-    protected static String getAbsolutePath(String strPath)
+    protected static String getAbsolutePath( String strPath )
     {
         Path path = Paths.get( strPath );
         if ( path.isAbsolute( ) )
@@ -108,7 +108,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
         else
         {
             // relative
-            return AppPathService.getAbsolutePathFromRelativePath(( strPath.startsWith(SLASH) ? EMPTY : SLASH ) + strPath );
+            return AppPathService.getAbsolutePathFromRelativePath( ( strPath.startsWith( SLASH ) ? EMPTY : SLASH ) + strPath );
         }
     }
 
@@ -131,7 +131,7 @@ public abstract class AbstractManageLogsPropertiesJspBean extends MVCAdminJspBea
             if ( !ManageLogsUtil.isNullOrEmptyWithTrim( line ) && !line.trim( ).startsWith( "#" ) && line.split( "=" ).length == 2 && line.contains( ".File=" ) )
             {
                 String fileName = line.split( "=" )[ 1 ];
-                String strParentAbsoluteDirectory = Paths.get( getAbsolutePath( fileName.replaceAll( "\r",EMPTY ) ) ).getParent( ).toString( );
+                String strParentAbsoluteDirectory = Paths.get( getAbsolutePath( fileName.replaceAll( "\r", EMPTY ) ) ).getParent( ).toString( );
                 if ( isLogFileAccessible( strParentAbsoluteDirectory ) )
                 {
                     listConfiguredFiles.add( fileName );

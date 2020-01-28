@@ -327,8 +327,8 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
     {
         try
         {
-            boolean isDeleted = Files.deleteIfExists(  Paths.get(TMP_LOG_PATH_ABSOLUTE + (TMP_LOG_PATH_ABSOLUTE.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME) );
-            if (!isDeleted)
+            boolean isDeleted = Files.deleteIfExists(  Paths.get( TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME ) );
+            if ( !isDeleted )
             {
                 AppLogService.error( "Error deleting file: " + TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH ) + TMP_LOG_FILE_NAME );
                 addError( ERROR_LOGPROPERTIES_DELETE, request.getLocale() );
@@ -348,7 +348,7 @@ public class LogPropertiesJspBean extends AbstractManageLogsPropertiesJspBean
         List<String> lines;
         try
         {
-            lines = Files.readAllLines( Paths.get( TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith(SLASH) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME), Charset.defaultCharset( ) );
+            lines = Files.readAllLines( Paths.get( TMP_LOG_PATH_ABSOLUTE + ( TMP_LOG_PATH_ABSOLUTE.endsWith( SLASH ) ? EMPTY : SLASH) + TMP_LOG_FILE_NAME ), Charset.defaultCharset( ) );
             StringBuilder properties = new StringBuilder( StringUtils.EMPTY );
             for ( String line: lines )
             {
