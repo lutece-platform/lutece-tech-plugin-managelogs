@@ -166,13 +166,13 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         }
 
         // try to find tmp log conf
-        setLogs.addAll( getLogsFromFile(TMP_LOG_ABSOLUTE, log4jConfigFile ) );
+        setLogs.addAll( getLogsFromFile( TMP_LOG_ABSOLUTE, log4jConfigFile ) );
 
         // try to find log.properties
-        setLogs.addAll( getLogsFromFile(ALTERNATE_LOG_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
+        setLogs.addAll( getLogsFromFile( ALTERNATE_LOG_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
 
         // try to find config.properties
-        setLogs.addAll( getLogsFromFile(LUTECE_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
+        setLogs.addAll( getLogsFromFile( LUTECE_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
 
         // additionnal logs defined in managelogs.properties
         String strListAdditionalLogDir = AppPropertiesService.getProperty( "managelogs.addlog.folder" );
