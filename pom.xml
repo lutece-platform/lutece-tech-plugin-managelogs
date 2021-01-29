@@ -9,7 +9,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>plugin-managelogs</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <name>Lutece managelogs plugin</name>
 
      <repositories>
@@ -73,6 +73,6 @@
         <connection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</developerConnection>
         <url>https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</url>
-        <tag>lutece-tech-plugin-managelogs-1.0.1</tag>
+        <tag>lutece-tech-plugin-managelogs-1.0.2</tag>
     </scm>
 </project>
