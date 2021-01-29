@@ -9,7 +9,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>plugin-managelogs</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>Lutece managelogs plugin</name>
 
      <repositories>
