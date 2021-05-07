@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Path;
 
-public class ManageLogFile
+public class ManageLogFile implements Comparable<ManageLogFile>
 {
     private Path _path;
     private String _fileName;
@@ -81,5 +81,11 @@ public class ManageLogFile
     public void setItemNumber( Integer itemNumber )
     {
         this._itemNumber = itemNumber;
+    }
+
+    @Override
+    public int compareTo( ManageLogFile o )
+    {
+        return this.getFileName().compareToIgnoreCase( o.getFileName( ) );
     }
 }

@@ -38,7 +38,7 @@
             <artifactId>lutece-core</artifactId>
             <!-- min version 5.0.1 to get html macros -->
             <version>[5.0.1,)</version>
-            <type>lutece-core</type>
+            <type>${type.lutece-core}</type>
         </dependency>
     </dependencies>
 
@@ -46,6 +46,7 @@
         <componentName>managelogs</componentName>
         <jiraProjectName>MANAGELOGS</jiraProjectName>
         <jiraComponentId />
+        <type.lutece-core>lutece-core</type.lutece-core>
     </properties>
 
     <profiles>

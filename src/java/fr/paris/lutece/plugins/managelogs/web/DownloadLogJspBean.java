@@ -88,9 +88,9 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
 
 
     // Session variable to store working values
+    List<ManageLogFile> listLogFiles;
 
     private static final String CONTENT_TYPE = "application/octet-stream";
-
 
     /**
      * Build the Manage View
@@ -110,7 +110,10 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
             AppLogService.error( "No log file found" );
         }
 
-        model.put( MARK_LIST_LOGS, fileList );
+        listLogFiles = ManageLogsUtil.removeDuplicateFiles( fileList );
+        ManageLogsUtil.reorderFiles(listLogFiles);
+
+        model.put( MARK_LIST_LOGS, listLogFiles );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_LOGPROPERTIESS, TEMPLATE_MANAGE_LOGPROPERTIESS, model );
     }
@@ -285,24 +288,40 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         String strId =request.getParameter( PARAMETER_ID_LOG );
 
         // get logs list
-        List<ManageLogFile> listRF = DownloadLogJspBean.getLogFilesMap();
+        //List<ManageLogFile> listRF = DownloadLogJspBean.getLogFilesMap();
 
-        if ( strId == null || Integer.parseInt( strId ) > listRF.size() )
-        {
+        if (strId == null) {
             AppLogService.error( "Error, log number null or invalid" );
         }
         else
         {
-
-            Path path = listRF.get( Integer.parseInt( strId ) ).getPath();
-
+            int idFile;
             try
             {
-                download( Files.readAllBytes( path ), path.getFileName().toString(), CONTENT_TYPE );
+                idFile = Integer.parseInt( strId );
             }
-            catch ( IOException e )
+            catch ( NumberFormatException nfe )
             {
-                AppLogService.error( "Error downloading file", e );
+                return getLogs( request );
+            }
+
+            if (  idFile < 0 || idFile >= listLogFiles.size() )
+            {
+                AppLogService.error( "Error, log number null or invalid" );
+            }
+            else
+            {
+
+                Path path = listLogFiles.get( idFile ).getPath();
+
+                try
+                {
+                    download( Files.readAllBytes( path ), path.getFileName().toString(), CONTENT_TYPE );
+                }
+                catch ( IOException e )
+                {
+                    AppLogService.error( "Error downloading file", e );
+                }
             }
         }
 
