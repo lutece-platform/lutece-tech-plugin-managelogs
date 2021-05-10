@@ -55,6 +55,8 @@ Définition des variables (tous les chemins peuvent être absolus ou relatifs) :
 <li>managelogs.lutecec.log.file : fichier par défaut de la configuration log4j de Lutece (par défaut config.properties)</li>
 <li>managelogs.limit.folder : permet de restreindre l'accès aux répertoires définis ici pour le téléchargement des fichiers. Défini pour des raisons de sécurité et éviter que l'utlisateur ne puisse via la modification à chaud de la configuration des logs de télécharger n'importe quel fichier du serveur. Liste de répertoires séparés par ';'</li>
 <li>managelogs.addlog.folder : permet d'ajouter des répertoires complémentaires (par exemple répertoire de log tomcat) pour télécharger les fichiers. Liste de répertoires séparés par ';'</li>
+<li>managelogs.remove_duplicate_log_files : true/false, permet de supprimer les doublons sur la base du nom de fichier et de son contenu</li>
+<li>managelogs.max_filesize_for_comparaison : taille maximale d'un fichier pour lancer la comparaison de suppression des doublons</li>
 </ul>
 
 ### Utilisation
