@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><plug-in>
     <name>managelogs</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <documentation>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</documentation>
     <installation>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</installation>
     <changes>https://github.com/lutece-platform/lutece-tech-plugin-managelogs</changes>
