@@ -291,7 +291,7 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
         //List<ManageLogFile> listRF = DownloadLogJspBean.getLogFilesMap();
 
         if (strId == null) {
-            AppLogService.error( "Error, log number null or invalid" );
+            AppLogService.error( "Error, log number null" );
         }
         else
         {
@@ -307,7 +307,7 @@ public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
 
             if (  idFile < 0 || idFile >= listLogFiles.size() )
             {
-                AppLogService.error( "Error, log number null or invalid" );
+                AppLogService.error( "Error, log number invalid ("+idFile+")" );
             }
             else
             {
