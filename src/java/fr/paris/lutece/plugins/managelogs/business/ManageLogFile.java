@@ -1,91 +1,169 @@
+/*
+ * Copyright (c) 2002-2019, Mairie de Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.managelogs.business;
+
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 
-import java.nio.file.Path;
-
-public class ManageLogFile implements Comparable<ManageLogFile>
+/**
+ * A log file offered for download.
+ */
+public class ManageLogFile implements Comparable<ManageLogFile>, Serializable
 {
-    private Path _path;
+    private static final long serialVersionUID = 1L;
+
+    private String _strPath;
     private String _fileName;
     private long _size;
-    private String _fileSize;
     private Integer _itemNumber;
 
-    public ManageLogFile( Path path)
-    {
-        this._path = path;
-        if (path != null) {
-            this._fileName = path.getFileName().toString();
-            this._size = FileUtils.sizeOf(path.toFile() );
-            this._fileSize = FileUtils.byteCountToDisplaySize( _size );
-        }
-    }
-
+    /**
+     * Builds a log file from its path.
+     *
+     * @param path
+     *            the file path
+     * @param itemNumber
+     *            the position of the file in the list
+     */
     public ManageLogFile( Path path, int itemNumber )
     {
-        this._path = path;
-        if (path != null) {
-            this._fileName = path.getFileName().toString();
-            this._size = FileUtils.sizeOf(path.toFile() );
-            this._fileSize = FileUtils.byteCountToDisplaySize( _size );
+        if ( path != null )
+        {
+            _strPath = path.toString( );
+            _fileName = path.getFileName( ).toString( );
+            _size = FileUtils.sizeOf( path.toFile( ) );
         }
-        this._itemNumber = itemNumber;
+        _itemNumber = itemNumber;
     }
 
+    /**
+     * Returns the path.
+     *
+     * @return the path
+     */
     public Path getPath( )
     {
-        return _path;
+        return _strPath == null ? null : Paths.get( _strPath );
     }
 
+    /**
+     * Sets the path.
+     *
+     * @param path
+     *            the path
+     */
     public void setPath( Path path )
     {
-        this._path = path;
+        _strPath = path == null ? null : path.toString( );
     }
 
+    /**
+     * Returns the file name.
+     *
+     * @return the file name
+     */
     public String getFileName( )
     {
         return _fileName;
     }
 
+    /**
+     * Sets the file name.
+     *
+     * @param fileName
+     *            the file name
+     */
     public void setFileName( String fileName )
     {
-        this._fileName = fileName;
+        _fileName = fileName;
     }
 
+    /**
+     * Returns the size in bytes.
+     *
+     * @return the size
+     */
     public long getSize( )
     {
         return _size;
     }
 
+    /**
+     * Sets the size in bytes.
+     *
+     * @param size
+     *            the size
+     */
     public void setSize( long size )
     {
-        this._size = size;
+        _size = size;
     }
 
-    public String getFileSize( )
-    {
-        return _fileSize;
-    }
-
-    public void setFileSize( String fileSize )
-    {
-        this._fileSize = fileSize;
-    }
-
+    /**
+     * Returns the position of the file in the list.
+     *
+     * @return the position
+     */
     public Integer getItemNumber( )
     {
         return _itemNumber;
     }
 
+    /**
+     * Sets the position of the file in the list.
+     *
+     * @param itemNumber
+     *            the position
+     */
     public void setItemNumber( Integer itemNumber )
     {
-        this._itemNumber = itemNumber;
+        _itemNumber = itemNumber;
     }
 
+    /**
+     * Compares the file names, ignoring case.
+     *
+     * @param o
+     *            the other file
+     * @return the comparison result
+     */
     @Override
     public int compareTo( ManageLogFile o )
     {
-        return this.getFileName().compareToIgnoreCase( o.getFileName( ) );
+        return getFileName( ).compareToIgnoreCase( o.getFileName( ) );
     }
 }

@@ -31,301 +31,139 @@
  *
  * License 1.0
  */
- 	
 package fr.paris.lutece.plugins.managelogs.web;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.paris.lutece.plugins.managelogs.business.ManageLogFile;
-import fr.paris.lutece.plugins.managelogs.util.ManageLogsUtil;
+import fr.paris.lutece.plugins.managelogs.service.LogFileService;
 import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-
-import static fr.paris.lutece.plugins.managelogs.web.AbstractManageLogsPropertiesJspBean.RIGHT_MANAGELOGSPROPERTIES;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This class provides the user interface to download logs
  */
-@Controller( controllerJsp = "DownloadLog.jsp", controllerPath = "jsp/admin/plugins/managelogs/", right = RIGHT_MANAGELOGSPROPERTIES )
-public class DownloadLogJspBean extends AbstractManageLogsPropertiesJspBean
+@SessionScoped
+@Named
+@Controller( controllerJsp = "DownloadLog.jsp", controllerPath = "jsp/admin/plugins/managelogs/", right = DownloadLogJspBean.RIGHT_MANAGELOGSPROPERTIES, securityTokenEnabled = true )
+public class DownloadLogJspBean extends MVCAdminJspBean
 {
-    static final long serialVersionUID = -1;
-    
-    // Templates
+    public static final String RIGHT_MANAGELOGSPROPERTIES = "MANAGELOGS_MANAGEMENT";
+
+    private static final long serialVersionUID = -1L;
+
     private static final String TEMPLATE_MANAGE_LOGPROPERTIESS = "/admin/plugins/managelogs/download_logs.html";
 
-    // Parameters
     private static final String PARAMETER_ID_LOG = "idLog";
 
-    // Properties for page titles
     private static final String PROPERTY_PAGE_TITLE_MANAGE_LOGPROPERTIESS = "managelogs.manage_logdownload.pageTitle";
 
-    // Markers
     private static final String MARK_LIST_LOGS = "logs_list";
-    // Properties
 
-    // Validations
-
-    // Views
     private static final String VIEW_DEFAULT = "listLogs";
 
-    // Actions
     private static final String ACTION_DOWNLOAD_LOG = "download";
-
-    // Infos
-
-    // Errors
-
-
-    // Session variable to store working values
-    List<ManageLogFile> listLogFiles;
 
     private static final String CONTENT_TYPE = "application/octet-stream";
 
-    /**
-     * Build the Manage View
-     * @param request The HTTP request
-     * @return The page
-     */
-    @View( value = VIEW_DEFAULT, defaultView = true )
-    public String getLogs( HttpServletRequest request )
-    {
-        Map<String, Object> model = new HashMap<>(  );
+    @Inject
+    private LogFileService _logFileService;
 
-        List<ManageLogFile> fileList = getLogFilesMap();
-
-        if ( fileList.isEmpty() )
-        {
-            // no conf found or no log file
-            AppLogService.error( "No log file found" );
-        }
-
-        listLogFiles = ManageLogsUtil.removeDuplicateFiles( fileList );
-        ManageLogsUtil.reorderFiles(listLogFiles);
-
-        model.put( MARK_LIST_LOGS, listLogFiles );
-
-        return getPage( PROPERTY_PAGE_TITLE_MANAGE_LOGPROPERTIESS, TEMPLATE_MANAGE_LOGPROPERTIESS, model );
-    }
-
-    private static List<ManageLogFile> getLogFilesMap()
-    {
-        List<ManageLogFile> fileList = new ArrayList<>();
-
-        Set<Path> setLogFiles = getLogFiles();
-
-        if ( setLogFiles.isEmpty() )
-        {
-            // no conf found or no log file
-            AppLogService.error( "No log file found" );
-        }
-        else
-        {
-            // sort files
-            List<Path> listFilesSorted = new ArrayList<>( setLogFiles );
-            Collections.sort( listFilesSorted );//TODO
-
-            int i=0;
-            for ( Path file : listFilesSorted )
-            {
-                fileList.add( new ManageLogFile( file, i ) );
-                i++;
-            }
-        }
-
-        return fileList;
-    }
+    private List<ManageLogFile> _listLogFiles = new ArrayList<>( );
 
     /**
-     * find log configurations and get log files from them
-     * @return list of log file
-     */
-    private static Set<Path> getLogFiles()
-    {
-        // Using set to avoid duplicates
-        Set<Path> setLogs = new HashSet<>( );
-
-        // STEP 1: get all configuration and log files
-        String log4jConfigFile = null;
-
-        // get log file from log4j configuration
-        if ( !APP_SERVER_MULTI_WEBAPP )
-        {
-            log4jConfigFile = System.getProperty( "log4j.configuration" );
-            if ( ManageLogsUtil.isFileReadable( log4jConfigFile ) )
-            {
-                setLogs.addAll( readLogConf( log4jConfigFile ) );
-            }
-        }
-
-        // try to find tmp log conf
-        setLogs.addAll( getLogsFromFile( TMP_LOG_ABSOLUTE, log4jConfigFile ) );
-
-        // try to find log.properties
-        setLogs.addAll( getLogsFromFile( ALTERNATE_LOG_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
-
-        // try to find config.properties
-        setLogs.addAll( getLogsFromFile( LUTECE_CONF_FILE_ABSOLUTE, log4jConfigFile ) );
-
-        // additionnal logs defined in managelogs.properties
-        String strListAdditionalLogDir = AppPropertiesService.getProperty( "managelogs.addlog.folder" );
-        if ( strListAdditionalLogDir != null )
-        {
-            for ( String logDir : strListAdditionalLogDir.split( ";" ) )
-            {
-                if ( !ManageLogsUtil.isNullOrEmptyWithTrim( logDir ) )
-                {
-                    try
-                    {
-                        setLogs.addAll ( listFilesInDirectory( logDir.trim() ) );
-                    }
-                    catch ( IOException e )
-                    {
-                        AppLogService.error( "Error getting additionnal files from " + logDir, e );
-                    }
-                }
-            }
-        }
-
-        return setLogs;
-    }
-
-    private static Set<Path> getLogsFromFile( String file, String log4jConfigFile )
-    {
-        Set<Path> setLogs = new HashSet<>( );
-        if ( !file.equalsIgnoreCase( log4jConfigFile ) && ManageLogsUtil.isFileReadable( file ) )
-        {
-            setLogs.addAll( readLogConf( file ) );
-        }
-        return setLogs;
-    }
-
-    /**
-     * read config file and log files from them
-     * @param fileName log configuration file
-     * @return list of log file names (with path)
-     */
-    private static Set<Path> readLogConf( String fileName )
-    {
-        Set<Path> logFile = new HashSet<>(  );
-        try
-        {
-            List<String> lines = Files.readAllLines( Paths.get( fileName ), Charset.defaultCharset( ) );
-
-            List<String> listFilesFromConfiguration = getFilesFromConfiguration( lines, false );
-
-            for ( String fileFromConfiguration : listFilesFromConfiguration )
-            {
-                String absoluteDirectory = Paths.get( fileFromConfiguration ).getParent().toString();
-
-                // listing all files
-                Set<Path> filesInDirectory = listFilesInDirectory( absoluteDirectory );
-                for ( Path fileInDirectory : filesInDirectory )
-                {
-                    // check if the listed file is a derivative of the configured log file (log rotation)
-                    if ( fileInDirectory.getFileName().toString().startsWith( Paths.get( fileFromConfiguration ).getFileName().toString() ) )
-                    {
-                        logFile.add( fileInDirectory );
-                    }
-                }
-            }
-        }
-        catch ( IOException e )
-        {
-            AppLogService.error( "Error reading file " + fileName, e );
-        }
-
-        return logFile;
-    }
-
-
-
-    /**
-     * Return files of a directory, with check of allowed directories
-     * @param dir directory to list
-     * @return list of files in directory
-     * @throws IOException error in reading the directory
-     */
-    private static Set<Path> listFilesInDirectory( String dir ) throws IOException
-    {
-        Set<Path> fileList = new HashSet<>();
-        if ( ManageLogsUtil.isFileReadable( dir ) )
-        {
-            try ( DirectoryStream<Path> stream = Files.newDirectoryStream( Paths.get( dir ) ) )
-            {
-                for ( Path path : stream )
-                {
-                    if ( !Files.isDirectory( path ) && isLogFileAccessible( path.toString( ) ) )
-                    {
-                        fileList.add( path );
-                    }
-                }
-            }
-        }
-        return fileList;
-    }
-
-    /**
-     * Download a file
+     * Builds the list of the log files.
      *
+     * @param model
+     *            the model
      * @param request
      *            The HTTP request
      * @return The page
      */
-    @Action( ACTION_DOWNLOAD_LOG )
-    public String downloadLog( HttpServletRequest request )
+    @View( value = VIEW_DEFAULT, defaultView = true )
+    public String getLogs( Models model, HttpServletRequest request )
     {
-        String strId =request.getParameter( PARAMETER_ID_LOG );
+        _listLogFiles = new ArrayList<>( _logFileService.getLogFiles( ) );
 
-        // get logs list
-        //List<ManageLogFile> listRF = DownloadLogJspBean.getLogFilesMap();
-
-        if (strId == null) {
-            AppLogService.error( "Error, log number null" );
-        }
-        else
+        if ( _listLogFiles.isEmpty( ) )
         {
-            int idFile;
-            try
-            {
-                idFile = Integer.parseInt( strId );
-            }
-            catch ( NumberFormatException nfe )
-            {
-                return getLogs( request );
-            }
-
-            if (  idFile < 0 || idFile >= listLogFiles.size() )
-            {
-                AppLogService.error( "Error, log number invalid ("+idFile+")" );
-            }
-            else
-            {
-
-                Path path = listLogFiles.get( idFile ).getPath();
-
-                try
-                {
-                    download( Files.readAllBytes( path ), path.getFileName().toString(), CONTENT_TYPE );
-                }
-                catch ( IOException e )
-                {
-                    AppLogService.error( "Error downloading file", e );
-                }
-            }
+            AppLogService.debug( "No log file found" );
         }
 
-        return getLogs( request );
+        model.put( MARK_LIST_LOGS, _listLogFiles );
+
+        return getPage( PROPERTY_PAGE_TITLE_MANAGE_LOGPROPERTIESS, TEMPLATE_MANAGE_LOGPROPERTIESS, model );
     }
 
+    /**
+     * Sends a log file of the list shown last, from DoDownloadLog.jsp which writes nothing else.
+     *
+     * @param request
+     *            The HTTP request
+     * @return null once the file is sent, else the redirection to the list
+     */
+    @Action( value = ACTION_DOWNLOAD_LOG, securityTokenDisabled = true )
+    public String downloadLog( HttpServletRequest request )
+    {
+        ManageLogFile logFile = getLogFile( request.getParameter( PARAMETER_ID_LOG ) );
+
+        if ( logFile != null )
+        {
+            Path path = logFile.getPath( );
+
+            try
+            {
+                download( Files.readAllBytes( path ), path.getFileName( ).toString( ), CONTENT_TYPE );
+                return null;
+            }
+            catch( IOException e )
+            {
+                AppLogService.error( "Error downloading file {}", path, e );
+            }
+        }
+
+        return redirectView( request, VIEW_DEFAULT );
+    }
+
+    /**
+     * Returns the log file of the list shown last whose number is given.
+     *
+     * @param strId
+     *            the number of the file
+     * @return the log file, or null when the number is not one of the list
+     */
+    private ManageLogFile getLogFile( String strId )
+    {
+        int nIdFile;
+
+        try
+        {
+            nIdFile = Integer.parseInt( strId );
+        }
+        catch( NumberFormatException e )
+        {
+            AppLogService.error( "Error, log number invalid ({})", strId );
+            return null;
+        }
+
+        if ( nIdFile < 0 || nIdFile >= _listLogFiles.size( ) )
+        {
+            AppLogService.error( "Error, log number invalid ({})", nIdFile );
+            return null;
+        }
+
+        return _listLogFiles.get( nIdFile );
+    }
 }

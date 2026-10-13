@@ -2,14 +2,14 @@
     <parent>
         <artifactId>lutece-global-pom</artifactId>
         <groupId>fr.paris.lutece.tools</groupId>
-        <version>7.0.2</version>
+        <version>8.0.3</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>plugin-managelogs</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>Lutece managelogs plugin</name>
 
      <repositories>
@@ -36,39 +36,26 @@
         <dependency>
             <groupId>fr.paris.lutece</groupId>
             <artifactId>lutece-core</artifactId>
-            <!-- min version 5.0.1 to get html macros -->
-            <version>[5.0.1,7.9.9)</version>
+            <version>[8.0.0,)</version>
             <type>${type.lutece-core}</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.paris.lutece.plugins</groupId>
+            <artifactId>library-lutece-unit-testing</artifactId>
+            <type>jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <properties>
         <componentName>managelogs</componentName>
-        <jiraProjectName>MANAGELOGS</jiraProjectName>
-        <jiraComponentId />
         <type.lutece-core>lutece-core</type.lutece-core>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>lutece-test-hsql</id>
-            <activation>
-                <property>
-                    <name>lutece-test-hsql</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <version>2.3.4</version>
-                </dependency>
-            </dependencies>
-            <properties>
-                <antrun-lutece-db-properties>db-test-hsql.properties</antrun-lutece-db-properties>
-            </properties>
-        </profile>
-    </profiles>
 
     <scm>
         <connection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-managelogs.git</connection>

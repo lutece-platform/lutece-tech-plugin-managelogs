@@ -1,43 +1,32 @@
-<#include "managelogsproperties_tabs.html" />
-<@tabs tab="download" />
-
-<@rowBox>
-    <@boxHeader i18nTitleKey="managelogs.manage_logdownload.title">
-        <@headerButtons>
-
-        </@headerButtons>
-    </@boxHeader>
-    <@boxBody>
-    <@messages infos=infos />
-
-    <#if logs_list?has_content>
-        <@table>
-                <tr>
-                    <th>#i18n{managelogs.manage_logdownload.filename}</th>
-                    <th>#i18n{managelogs.manage_logdownload.filesize}</th>
-                    <th></th>
-                </tr>
-                <@tableHeadBodySeparator />
-                    <#list logs_list as log >
-                        <tr>
-                            <td>${log.fileName!}</td>
-                            <td>${log.fileSize!}</td>
-                            <td>
-                                <form class="form-horizontal" action="jsp/admin/plugins/managelogs/DownloadLog.jsp" method="post" name="download" role="form">
-                                    <input type="hidden" name="idLog" value="${log.itemNumber!}">
-                                    <button class="btn btn-primary btn-flat" type="submit" title="Telecharger log" name="action_download">
-                                        <i class="fa fa-download" aria-hidden="true"></i>
-                                        #i18n{managelogs.manage_logdownload.download}
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    </#list>
-
-         </@table>
-    <#else>
-        <span>#i18n{managelogs.manage_logdownload.empty}</span>
-    </#if>
-
-  </@boxBody>
-</@rowBox>
+<@pageContainer>
+    <@pageColumn>
+        <@pageHeader title='#i18n{managelogs.manage_logdownload.title}' />
+        <@messages infos=infos![] errors=errors![] warnings=warnings![] />
+        <#if logs_list?has_content>
+        <@table id='managelogs-files'>
+            <@tr>
+                <@th>#i18n{managelogs.manage_logdownload.filename}</@th>
+                <@th>#i18n{managelogs.manage_logdownload.filesize}</@th>
+                <@th align='end'>#i18n{portal.util.labelActions}</@th>
+            </@tr>
+            <@tableHeadBodySeparator />
+            <#list logs_list as log>
+            <@tr>
+                <@td>${log.fileName!}</@td>
+                <@td><#assign size = log.size><#if size lt 1024>${size?c} #i18n{managelogs.manage_logdownload.unit.byte}<#elseif size lt 1048576>${(size / 1024)?floor?c} #i18n{managelogs.manage_logdownload.unit.kb}<#elseif size lt 1073741824>${(size / 1048576)?floor?c} #i18n{managelogs.manage_logdownload.unit.mb}<#else>${(size / 1073741824)?floor?c} #i18n{managelogs.manage_logdownload.unit.gb}</#if></@td>
+                <@td align='end'>
+                    <@tform type='inline' action='jsp/admin/plugins/managelogs/DoDownloadLog.jsp' name='download_${log.itemNumber!}'>
+                        <@input type='hidden' name='idLog' value='${log.itemNumber!}' />
+                        <@button type='submit' name='action_download' buttonIcon='download' title='#i18n{managelogs.manage_logdownload.download}' color='primary' size='sm' />
+                    </@tform>
+                </@td>
+            </@tr>
+            </#list>
+        </@table>
+        <#else>
+        <@card>
+            <@empty title='#i18n{managelogs.manage_logdownload.empty}' subtitle='#i18n{managelogs.manage_logdownload.empty.help}' iconName='file-off' />
+        </@card>
+        </#if>
+    </@pageColumn>
+</@pageContainer>
