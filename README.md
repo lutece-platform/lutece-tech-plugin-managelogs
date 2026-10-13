@@ -3,78 +3,64 @@
 ## English version
 
 ### Introduction
-This plugin allows you to modify log4j configuration on the fly and download log files from within your Lutece back-office.
+This plugin lets you download the log files of the webapp from the Lutece back-office.
 
 ### Configuration
 Edit WEB-INF/conf/override/plugins/managelogs.properties file
 Change values for
 <ul>
-<li>managelogs.limit.folder : folders from wich your are allowed to download log files</li>
-<li>managelogs.addlog.folder : additionnal log folder (like tomcat log folder) to grep log files from beyond folders declared in your Lutece log4j</li>
+<li>managelogs.addlog.folder : additional log folders (like the application server log folder) to list beyond the files written by the Log4j 2 configuration of the webapp</li>
+<li>managelogs.limit.folder : folders (and sub-folders) the files of managelogs.addlog.folder must lie in</li>
 </ul>
-    
 
 ### Usage
-First step: Add the right "MANAGELOGS_MANAGEMENT" to your admin user
-
-Access log managment via System>Manage log
-
-First tab allows you to configure a new log4j properties file or revert to default
-
-Second tab allows you to download log files
+Add the right "MANAGELOGS_MANAGEMENT" to your admin user, then open the feature: it lists the files written by the
+file appenders of the Log4j 2 configuration (with their rolled files) and the files of managelogs.addlog.folder.
+When Log4j 2 sends its events to the application server (site built with the container-runtime profile: log4j-to-jul,
+no log4j-core), the files of the server log folder (system property server.logs.dir, Open Liberty) are listed instead
+of the appender files.
 
 ### Additional information
-Minimum Lutece version is 5.0.1 with java 7
+Minimum Lutece version is 8.0.0 with Java 17
 
 ## French version
 
 ### Introduction
-Le plugin permet de modifier la configuration log4j à chaud et de télécharger l'ensemble des logs de l'application (Lutece + tomcat) via le BO Lutece.
-
+Le plugin permet de tÃ©lÃ©charger les fichiers de log de l'application via le BO Lutece.
 
 ### Installation
-Ajouter la dépendance suivante au pom.xml du site Lutece :
+Ajouter la dÃ©pendance suivante au pom.xml du site Lutece :
 
-&lt;dependency&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;fr.paris.lutece.plugins&lt;/groupId&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;plugin-managelogs&lt;/artifactId&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;1.0.0&lt;/version&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;type&gt;lutece-plugin&lt;/type&gt;<br>
-&lt;/dependency&gt;
+```xml
+<dependency>
+    <groupId>fr.paris.lutece.plugins</groupId>
+    <artifactId>plugin-managelogs</artifactId>
+    <version>2.0.0</version>
+    <type>lutece-plugin</type>
+</dependency>
+```
 
 ### Configuration
-Surcharger dans le répertoire "WEB-INF/conf/override" le fichier managelogs.properties
+Surcharger dans le rÃ©pertoire "WEB-INF/conf/override/plugins" le fichier managelogs.properties
 
-Les deux variables à minima à surcharger sont "managelogs.limit.folder" et "managelogs.addlog.folder"
-
-Définition des variables (tous les chemins peuvent être absolus ou relatifs) :
+DÃ©finition des variables (tous les chemins peuvent Ãªtre absolus ou relatifs Ã  la webapp) :
 <ul>
-<li>managelogs.tmp.log.path : défini le chemin dans lequel le fichier de log surchargeant la configuration log4j est déposé (par défaut /WEB-INF/conf/override/). Attention le chemin ne doit pas être /WEB-INF/conf/ et il doit exister au lancement de l'application</li>
-<li>managelogs.tmp.log.filename : défini le nom du fichier surchargeant la configuration log4j</li>
-<li>managelogs.lutece.log.path : chemin contenant la configuration par défaut log4j de Lutece (chemin vers le fichier config.properties)</li>
-<li>managelogs.lutecec.log.file : fichier par défaut de la configuration log4j de Lutece (par défaut config.properties)</li>
-<li>managelogs.limit.folder : permet de restreindre l'accès aux répertoires définis ici pour le téléchargement des fichiers. Défini pour des raisons de sécurité et éviter que l'utlisateur ne puisse via la modification à chaud de la configuration des logs de télécharger n'importe quel fichier du serveur. Liste de répertoires séparés par ';'</li>
-<li>managelogs.addlog.folder : permet d'ajouter des répertoires complémentaires (par exemple répertoire de log tomcat) pour télécharger les fichiers. Liste de répertoires séparés par ';'</li>
-<li>managelogs.remove_duplicate_log_files : true/false, permet de supprimer les doublons sur la base du nom de fichier et de son contenu</li>
+<li>managelogs.addlog.folder : rÃ©pertoires complÃ©mentaires (par exemple le rÃ©pertoire de log du serveur d'application) dont les fichiers sont proposÃ©s au tÃ©lÃ©chargement. Liste de rÃ©pertoires sÃ©parÃ©s par ';'</li>
+<li>managelogs.limit.folder : rÃ©pertoires (et sous-rÃ©pertoires) dans lesquels doivent se trouver les fichiers de managelogs.addlog.folder. Liste de rÃ©pertoires sÃ©parÃ©s par ';'</li>
+<li>managelogs.remove_duplicate_log_files : true/false, supprime les doublons sur la base du nom de fichier et de son contenu</li>
 <li>managelogs.max_filesize_for_comparaison : taille maximale d'un fichier pour lancer la comparaison de suppression des doublons</li>
 </ul>
 
 ### Utilisation
-1) Activer le plugin dans la gestion des plugins du BO Lutece
+1) Ajouter le droit "MANAGELOGS_MANAGEMENT" Ã  l'utilisateur d'administration qui devra Ãªtre habilitÃ©
 
-2) Ajouter le droit "Manage Logs Properties (Niveau 0) - Manage log4j properties" à l'utilisateur d'administration qui devra être habilité
+2) AccÃ©der Ã  la fonctionnalitÃ© : elle liste les fichiers Ã©crits par les appenders fichier de la configuration Log4j 2 de
+la webapp (avec leurs fichiers archivÃ©s) et les fichiers des rÃ©pertoires de managelogs.addlog.folder.
+Quand Log4j 2 envoie ses Ã©vÃ©nements au serveur d'application (site construit avec le profil container-runtime :
+log4j-to-jul, sans log4j-core), ce sont les fichiers du rÃ©pertoire de logs du serveur (propriÃ©tÃ© systÃ¨me
+server.logs.dir, Open Liberty) qui sont listÃ©s Ã  la place de ceux des appenders.
 
-3) Accéder à la page Manage Logs Properties
-
-
-Le premier onglet permet de modifier le fichier de surcharge log4j et de savoir quel fichier de configuration des logs est en cours d'utilisation
-
-Attention la surchage log4j doit contenir l'ensemble de la configuration log4j voulue car le fichier vient se substituer entièrement à la configuration log4j du fichier par défaut.
-
-Le deuxième onglet remonte les fichiers de log définis dans la configuration log4j ainsi que les fichiers définis par la variable managelogs.addlog.folder du plugin.
-
-
-### Informations complémentaires
+### Informations complÃ©mentaires
 Le code du plugin est disponible sur github: https://github.com/lutece-platform/lutece-tech-plugin-managelogs
 
-La version minimum de Lutece supportée est la 5.0.1 (java 7)
+La version minimum de Lutece supportÃ©e est la 8.0.0 (Java 17)

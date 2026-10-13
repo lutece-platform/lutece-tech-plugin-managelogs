@@ -31,108 +31,125 @@
  *
  * License 1.0
  */
-
 package fr.paris.lutece.plugins.managelogs.util;
 
-import fr.paris.lutece.plugins.managelogs.business.ManageLogFile;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import org.apache.commons.io.FileUtils;
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ManageLogsUtil
-{
-    private static final String PROPERTY_REMOVE_DUPLICATE_LOG_FILES= "managelogs.remove_duplicate_log_files";
-    private static final String PROPERTY_MAX_FILESIZE_FOR_COMPARAISON = "managelogs.max_filesize_for_comparaison";
+import org.apache.commons.io.FileUtils;
 
+import fr.paris.lutece.plugins.managelogs.business.ManageLogFile;
+import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+
+/**
+ * Utilities on the log files list.
+ */
+public final class ManageLogsUtil
+{
+    private static final String PROPERTY_REMOVE_DUPLICATE_LOG_FILES = "managelogs.remove_duplicate_log_files";
+    private static final String PROPERTY_MAX_FILESIZE_FOR_COMPARAISON = "managelogs.max_filesize_for_comparaison";
+    private static final int DEFAULT_MAX_FILESIZE_FOR_COMPARAISON = 10485760;
+
+    /**
+     * Private constructor.
+     */
     private ManageLogsUtil( )
     {
-
     }
 
     /**
-     * Check for null or empty string (after trim)
-     * @param strInput input String
-     * @return result of check for null and empty
+     * Checks for a null or blank string.
+     *
+     * @param strInput
+     *            input String
+     * @return true if the string is null or blank
      */
     public static boolean isNullOrEmptyWithTrim( String strInput )
     {
-        return strInput == null || strInput.trim().isEmpty();
+        return strInput == null || strInput.trim( ).isEmpty( );
     }
 
     /**
-     * Check if a file is readable on the system file (uses java nio Files and Paths)
-     * @param strFile absolute path
-     * @return result of check
-     */
-    public static boolean isFileReadable( String strFile )
-    {
-        return !isNullOrEmptyWithTrim( strFile ) && Files.isReadable( Paths.get ( strFile ) );
-    }
-
-    /**
-     * Remove files that have same name and same content
+     * Removes the files that have the same name and the same content as a later file of the list, when
+     * managelogs.remove_duplicate_log_files is true.
+     *
      * @param fileList
-     * @return
+     *            the files
+     * @return the files without duplicates
      */
     public static List<ManageLogFile> removeDuplicateFiles( List<ManageLogFile> fileList )
     {
-        boolean removeDuplicates = AppPropertiesService.getPropertyBoolean( PROPERTY_REMOVE_DUPLICATE_LOG_FILES, false );
+        boolean bRemoveDuplicates = AppPropertiesService.getPropertyBoolean( PROPERTY_REMOVE_DUPLICATE_LOG_FILES, false );
 
-        if (removeDuplicates && fileList != null && !fileList.isEmpty())
-        {
-            int maxFileSizeForComparaison = AppPropertiesService.getPropertyInt( PROPERTY_MAX_FILESIZE_FOR_COMPARAISON, 10485760 );// default 10 MB
-            List<ManageLogFile> returnFileList = new ArrayList<>();
-
-            for ( int i=0; i<fileList.size(); i++ ) {
-                ManageLogFile logFile = fileList.get( i );
-
-                boolean fileHasDuplicate = false;
-                if ( logFile.getSize() <= maxFileSizeForComparaison )
-                {
-                    for ( int j=i+1; j<fileList.size(); j++)
-                    {
-                        ManageLogFile fileToCompare = fileList.get( j );
-                        if (logFile.getFileName( ).equals( fileToCompare.getFileName( ) ) ) {
-                            try
-                            {
-                                if ( FileUtils.contentEquals( logFile.getPath( ).toFile( ), fileToCompare.getPath( ).toFile( ) ) )
-                                {
-                                    // content is equal
-                                    fileHasDuplicate = true;
-                                    break;
-                                }
-                            }
-                            catch ( IOException e )
-                            {
-                                // do nothing
-                            }
-                        }
-                    }
-                }
-                if ( !fileHasDuplicate )
-                {
-                    returnFileList.add( logFile );
-                }
-            }
-
-            return returnFileList;
-        }
-        else
+        if ( !bRemoveDuplicates || fileList == null || fileList.isEmpty( ) )
         {
             return fileList;
         }
+
+        int nMaxFileSizeForComparaison = AppPropertiesService.getPropertyInt( PROPERTY_MAX_FILESIZE_FOR_COMPARAISON, DEFAULT_MAX_FILESIZE_FOR_COMPARAISON );
+        List<ManageLogFile> returnFileList = new ArrayList<>( );
+
+        for ( int i = 0; i < fileList.size( ); i++ )
+        {
+            ManageLogFile logFile = fileList.get( i );
+
+            if ( logFile.getSize( ) > nMaxFileSizeForComparaison || !hasDuplicateAfter( fileList, i ) )
+            {
+                returnFileList.add( logFile );
+            }
+        }
+
+        return returnFileList;
     }
 
+    /**
+     * Tells whether a later file of the list has the same name and the same content.
+     *
+     * @param fileList
+     *            the files
+     * @param nIndex
+     *            the index of the file to compare
+     * @return true if a later file is a duplicate
+     */
+    private static boolean hasDuplicateAfter( List<ManageLogFile> fileList, int nIndex )
+    {
+        ManageLogFile logFile = fileList.get( nIndex );
+
+        for ( int j = nIndex + 1; j < fileList.size( ); j++ )
+        {
+            ManageLogFile fileToCompare = fileList.get( j );
+
+            try
+            {
+                if ( logFile.getFileName( ).equals( fileToCompare.getFileName( ) )
+                        && FileUtils.contentEquals( logFile.getPath( ).toFile( ), fileToCompare.getPath( ).toFile( ) ) )
+                {
+                    return true;
+                }
+            }
+            catch( IOException e )
+            {
+                AppLogService.debug( "Error comparing {} and {}", logFile.getPath( ), fileToCompare.getPath( ), e );
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Sorts the files by name and numbers them from 0.
+     *
+     * @param logFilesDedup
+     *            the files
+     */
     public static void reorderFiles( List<ManageLogFile> logFilesDedup )
     {
         Collections.sort( logFilesDedup );
-        for ( int i=0; i<logFilesDedup.size(); i++)
+
+        for ( int i = 0; i < logFilesDedup.size( ); i++ )
         {
             logFilesDedup.get( i ).setItemNumber( i );
         }
