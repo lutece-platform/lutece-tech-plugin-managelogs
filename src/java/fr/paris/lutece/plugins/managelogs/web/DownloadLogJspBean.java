@@ -34,13 +34,18 @@
 package fr.paris.lutece.plugins.managelogs.web;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+
 import fr.paris.lutece.plugins.managelogs.business.ManageLogFile;
 import fr.paris.lutece.plugins.managelogs.service.LogFileService;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
@@ -51,6 +56,7 @@ import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This class provides the user interface to download logs
@@ -76,12 +82,44 @@ public class DownloadLogJspBean extends MVCAdminJspBean
 
     private static final String ACTION_DOWNLOAD_LOG = "download";
 
+    private static final String ERROR_INVALID_LOG = "managelogs.manage_logdownload.error.invalid";
+
+    private static final String ERROR_DOWNLOAD_LOG = "managelogs.manage_logdownload.error.download";
+
     private static final String CONTENT_TYPE = "application/octet-stream";
+
+    private static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+
+    private static final String HEADER_CACHE_CONTROL = "Cache-Control";
+
+    private static final String CACHE_CONTROL_NO_STORE = "no-store";
 
     @Inject
     private LogFileService _logFileService;
 
     private List<ManageLogFile> _listLogFiles = new ArrayList<>( );
+
+    // the core keeps the response private : kept here to stream the file
+    private transient HttpServletResponse _response;
+
+    /**
+     * Keeps the response, to stream the file to download.
+     *
+     * @param request
+     *            The HTTP request
+     * @param response
+     *            The HTTP response
+     * @return The page
+     * @throws AccessDeniedException
+     *             if the user has not the right
+     */
+    @Override
+    public String processController( HttpServletRequest request, HttpServletResponse response ) throws AccessDeniedException
+    {
+        _response = response;
+
+        return super.processController( request, response );
+    }
 
     /**
      * Builds the list of the log files.
@@ -108,33 +146,52 @@ public class DownloadLogJspBean extends MVCAdminJspBean
     }
 
     /**
-     * Sends a log file of the list shown last, from DoDownloadLog.jsp which writes nothing else.
+     * Sends a log file of the list shown last, from DoDownloadLog.jsp which writes nothing else. The file is streamed, not
+     * loaded in memory, up to its size when the download starts, the file being possibly still written.
      *
      * @param request
      *            The HTTP request
-     * @return null once the file is sent, else the redirection to the list
+     * @return null once the file is sent, else the redirection to the list with an error
      */
     @Action( value = ACTION_DOWNLOAD_LOG, securityTokenDisabled = true )
     public String downloadLog( HttpServletRequest request )
     {
         ManageLogFile logFile = getLogFile( request.getParameter( PARAMETER_ID_LOG ) );
 
-        if ( logFile != null )
+        if ( logFile == null )
         {
-            Path path = logFile.getPath( );
+            addError( ERROR_INVALID_LOG, getLocale( ) );
+            return redirectView( request, VIEW_DEFAULT );
+        }
 
-            try
+        Path path = logFile.getPath( );
+
+        try ( InputStream inputStream = Files.newInputStream( path ) )
+        {
+            long lSize = Files.size( path );
+
+            _response.setContentType( CONTENT_TYPE );
+            _response.setHeader( HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + path.getFileName( ).toString( ).replace( '"', '_' ) + "\"" );
+            _response.setHeader( HEADER_CACHE_CONTROL, CACHE_CONTROL_NO_STORE );
+            _response.setContentLengthLong( lSize );
+
+            OutputStream outputStream = _response.getOutputStream( );
+            IOUtils.copyLarge( inputStream, outputStream, 0, lSize );
+            outputStream.flush( );
+        }
+        catch( IOException e )
+        {
+            AppLogService.error( "Error downloading file {}", path, e );
+
+            if ( !_response.isCommitted( ) )
             {
-                download( Files.readAllBytes( path ), path.getFileName( ).toString( ), CONTENT_TYPE );
-                return null;
-            }
-            catch( IOException e )
-            {
-                AppLogService.error( "Error downloading file {}", path, e );
+                _response.reset( );
+                addError( ERROR_DOWNLOAD_LOG, getLocale( ) );
+                return redirectView( request, VIEW_DEFAULT );
             }
         }
 
-        return redirectView( request, VIEW_DEFAULT );
+        return null;
     }
 
     /**

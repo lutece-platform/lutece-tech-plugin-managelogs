@@ -33,11 +33,11 @@
  */
 package fr.paris.lutece.plugins.managelogs.business;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import org.apache.commons.io.FileUtils;
 
 /**
  * A log file offered for download.
@@ -65,9 +65,28 @@ public class ManageLogFile implements Comparable<ManageLogFile>, Serializable
         {
             _strPath = path.toString( );
             _fileName = path.getFileName( ).toString( );
-            _size = FileUtils.sizeOf( path.toFile( ) );
+            _size = getSize( path );
         }
         _itemNumber = itemNumber;
+    }
+
+    /**
+     * Returns the size of a file, 0 when the file has been removed since it was listed (log rotation).
+     *
+     * @param path
+     *            the file path
+     * @return the size in bytes
+     */
+    private static long getSize( Path path )
+    {
+        try
+        {
+            return Files.size( path );
+        }
+        catch( IOException e )
+        {
+            return 0;
+        }
     }
 
     /**
