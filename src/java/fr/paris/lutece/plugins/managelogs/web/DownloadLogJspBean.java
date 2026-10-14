@@ -33,21 +33,28 @@
  */
 package fr.paris.lutece.plugins.managelogs.web;
 
-import fr.paris.lutece.plugins.managelogs.business.ManageLogFile;
-import fr.paris.lutece.plugins.managelogs.service.LogFileService;
-import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
-import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
+
+import fr.paris.lutece.plugins.managelogs.business.ManageLogFile;
+import fr.paris.lutece.plugins.managelogs.service.LogFileService;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 
 /**
  * This class provides the user interface to download logs
@@ -57,33 +64,58 @@ public class DownloadLogJspBean extends MVCAdminJspBean
 {
     public static final String RIGHT_MANAGELOGSPROPERTIES = "MANAGELOGS_MANAGEMENT";
 
-    static final long serialVersionUID = -1;
+    private static final long serialVersionUID = -1L;
 
-    // Templates
     private static final String TEMPLATE_MANAGE_LOGPROPERTIESS = "/admin/plugins/managelogs/download_logs.html";
 
-    // Parameters
     private static final String PARAMETER_ID_LOG = "idLog";
 
-    // Properties for page titles
     private static final String PROPERTY_PAGE_TITLE_MANAGE_LOGPROPERTIESS = "managelogs.manage_logdownload.pageTitle";
 
-    // Markers
     private static final String MARK_LIST_LOGS = "logs_list";
 
-    // Views
     private static final String VIEW_DEFAULT = "listLogs";
 
-    // Actions
     private static final String ACTION_DOWNLOAD_LOG = "download";
+
+    private static final String ERROR_INVALID_LOG = "managelogs.manage_logdownload.error.invalid";
+
+    private static final String ERROR_DOWNLOAD_LOG = "managelogs.manage_logdownload.error.download";
 
     private static final String CONTENT_TYPE = "application/octet-stream";
 
-    // Session variable to store working values
+    private static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+
+    private static final String HEADER_CACHE_CONTROL = "Cache-Control";
+
+    private static final String CACHE_CONTROL_NO_STORE = "no-store";
+
     private List<ManageLogFile> _listLogFiles = new ArrayList<>( );
 
+    // the core keeps the response private : kept here to stream the file
+    private transient HttpServletResponse _response;
+
     /**
-     * Build the Manage View
+     * Keeps the response, to stream the file to download.
+     *
+     * @param request
+     *            The HTTP request
+     * @param response
+     *            The HTTP response
+     * @return The page
+     * @throws AccessDeniedException
+     *             if the user has not the right
+     */
+    @Override
+    public String processController( HttpServletRequest request, HttpServletResponse response ) throws AccessDeniedException
+    {
+        _response = response;
+
+        return super.processController( request, response );
+    }
+
+    /**
+     * Builds the list of the log files.
      *
      * @param request
      *            The HTTP request
@@ -92,11 +124,11 @@ public class DownloadLogJspBean extends MVCAdminJspBean
     @View( value = VIEW_DEFAULT, defaultView = true )
     public String getLogs( HttpServletRequest request )
     {
-        _listLogFiles = LogFileService.getLogFiles( );
+        _listLogFiles = new ArrayList<>( LogFileService.getInstance( ).getLogFiles( ) );
 
         if ( _listLogFiles.isEmpty( ) )
         {
-            AppLogService.error( "No log file found" );
+            AppLogService.debug( "No log file found" );
         }
 
         Map<String, Object> model = getModel( );
@@ -106,41 +138,60 @@ public class DownloadLogJspBean extends MVCAdminJspBean
     }
 
     /**
-     * Download a log file of the list displayed by the view
+     * Sends a log file of the list shown last, from DoDownloadLog.jsp which writes nothing else. The file is streamed, not
+     * loaded in memory, up to its size when the download starts, the file being possibly still written.
      *
      * @param request
      *            The HTTP request
-     * @return The page, null when the file has been downloaded
+     * @return null once the file is sent, else the redirection to the list with an error
      */
     @Action( ACTION_DOWNLOAD_LOG )
     public String downloadLog( HttpServletRequest request )
     {
         ManageLogFile logFile = getLogFile( request.getParameter( PARAMETER_ID_LOG ) );
 
-        if ( logFile != null )
+        if ( logFile == null )
         {
-            Path path = logFile.getPath( );
+            addError( ERROR_INVALID_LOG, getLocale( ) );
+            return redirectView( request, VIEW_DEFAULT );
+        }
 
-            try
+        Path path = logFile.getPath( );
+
+        try ( InputStream inputStream = Files.newInputStream( path ) )
+        {
+            long lSize = Files.size( path );
+
+            _response.setContentType( CONTENT_TYPE );
+            _response.setHeader( HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + path.getFileName( ).toString( ).replace( '"', '_' ) + "\"" );
+            _response.setHeader( HEADER_CACHE_CONTROL, CACHE_CONTROL_NO_STORE );
+            _response.setContentLengthLong( lSize );
+
+            OutputStream outputStream = _response.getOutputStream( );
+            IOUtils.copyLarge( inputStream, outputStream, 0, lSize );
+            outputStream.flush( );
+        }
+        catch( IOException e )
+        {
+            AppLogService.error( "Error downloading file {}", path, e );
+
+            if ( !_response.isCommitted( ) )
             {
-                download( Files.readAllBytes( path ), path.getFileName( ).toString( ), CONTENT_TYPE );
-                return null;
-            }
-            catch( IOException e )
-            {
-                AppLogService.error( "Error downloading file {}", path, e );
+                _response.reset( );
+                addError( ERROR_DOWNLOAD_LOG, getLocale( ) );
+                return redirectView( request, VIEW_DEFAULT );
             }
         }
 
-        return getLogs( request );
+        return null;
     }
 
     /**
-     * Get a log file of the list displayed by the view
+     * Returns the log file of the list shown last whose number is given.
      *
      * @param strId
-     *            the number of the file in the list
-     * @return the file, null if the number is invalid
+     *            the number of the file
+     * @return the log file, or null when the number is not one of the list
      */
     private ManageLogFile getLogFile( String strId )
     {

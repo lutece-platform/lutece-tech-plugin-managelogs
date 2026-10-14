@@ -1,0 +1,1 @@
+<%@ page errorPage="../../ErrorPage.jsp" trimDirectiveWhitespaces="true" %><jsp:useBean id="downloadLogs" scope="session" class="fr.paris.lutece.plugins.managelogs.web.DownloadLogJspBean" /><% downloadLogs.processController( request , response ); %>
