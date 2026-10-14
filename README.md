@@ -3,14 +3,14 @@
 ## English version
 
 ### Introduction
-This plugin allows you to modify log4j configuration on the fly and download log files from within your Lutece back-office.
+This plugin allows you to download the log files of your Lutece webapp (Log4j 2 configuration) and of additional folders from within your Lutece back-office.
 
 ### Configuration
 Edit WEB-INF/conf/override/plugins/managelogs.properties file
 Change values for
 <ul>
-<li>managelogs.limit.folder : folders from wich your are allowed to download log files</li>
-<li>managelogs.addlog.folder : additionnal log folder (like tomcat log folder) to grep log files from beyond folders declared in your Lutece log4j</li>
+<li>managelogs.limit.folder : folders from wich your are allowed to download the log files of managelogs.addlog.folder</li>
+<li>managelogs.addlog.folder : additionnal log folder (like tomcat log folder) to grep log files from beyond the files written by your Lutece Log4j 2 configuration</li>
 </ul>
     
 
@@ -19,17 +19,15 @@ First step: Add the right "MANAGELOGS_MANAGEMENT" to your admin user
 
 Access log managment via System>Manage log
 
-First tab allows you to configure a new log4j properties file or revert to default
-
-Second tab allows you to download log files
+The page lists the log files and allows you to download them
 
 ### Additional information
-Minimum Lutece version is 5.0.1 with java 7
+This version requires Lutece 7 (lutece-core 7.0.0 to 7.x, Log4j 2) and Java 11. Use the 1.0.x versions (branch develop_core6) for Lutece 6 and the 2.x versions for Lutece 8.
 
 ## French version
 
 ### Introduction
-Le plugin permet de modifier la configuration log4j à chaud et de télécharger l'ensemble des logs de l'application (Lutece + tomcat) via le BO Lutece.
+Le plugin permet de télécharger l'ensemble des logs de l'application (Lutece + tomcat) via le BO Lutece.
 
 
 ### Installation
@@ -38,7 +36,7 @@ Ajouter la dépendance suivante au pom.xml du site Lutece :
 &lt;dependency&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;fr.paris.lutece.plugins&lt;/groupId&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;plugin-managelogs&lt;/artifactId&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;1.0.0&lt;/version&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;1.1.0&lt;/version&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;type&gt;lutece-plugin&lt;/type&gt;<br>
 &lt;/dependency&gt;
 
@@ -49,11 +47,7 @@ Les deux variables à minima à surcharger sont "managelogs.limit.folder" et "mana
 
 Définition des variables (tous les chemins peuvent être absolus ou relatifs) :
 <ul>
-<li>managelogs.tmp.log.path : défini le chemin dans lequel le fichier de log surchargeant la configuration log4j est déposé (par défaut /WEB-INF/conf/override/). Attention le chemin ne doit pas être /WEB-INF/conf/ et il doit exister au lancement de l'application</li>
-<li>managelogs.tmp.log.filename : défini le nom du fichier surchargeant la configuration log4j</li>
-<li>managelogs.lutece.log.path : chemin contenant la configuration par défaut log4j de Lutece (chemin vers le fichier config.properties)</li>
-<li>managelogs.lutecec.log.file : fichier par défaut de la configuration log4j de Lutece (par défaut config.properties)</li>
-<li>managelogs.limit.folder : permet de restreindre l'accès aux répertoires définis ici pour le téléchargement des fichiers. Défini pour des raisons de sécurité et éviter que l'utlisateur ne puisse via la modification à chaud de la configuration des logs de télécharger n'importe quel fichier du serveur. Liste de répertoires séparés par ';'</li>
+<li>managelogs.limit.folder : permet de restreindre l'accès aux répertoires définis ici pour le téléchargement des fichiers. Défini pour des raisons de sécurité : il s'applique aux fichiers de managelogs.addlog.folder, les fichiers de la configuration Log4j 2 étant toujours listés. Liste de répertoires séparés par ';'</li>
 <li>managelogs.addlog.folder : permet d'ajouter des répertoires complémentaires (par exemple répertoire de log tomcat) pour télécharger les fichiers. Liste de répertoires séparés par ';'</li>
 <li>managelogs.remove_duplicate_log_files : true/false, permet de supprimer les doublons sur la base du nom de fichier et de son contenu</li>
 <li>managelogs.max_filesize_for_comparaison : taille maximale d'un fichier pour lancer la comparaison de suppression des doublons</li>
@@ -62,19 +56,17 @@ Définition des variables (tous les chemins peuvent être absolus ou relatifs) :
 ### Utilisation
 1) Activer le plugin dans la gestion des plugins du BO Lutece
 
-2) Ajouter le droit "Manage Logs Properties (Niveau 0) - Manage log4j properties" à l'utilisateur d'administration qui devra être habilité
+2) Ajouter le droit "Gestion des logs" à l'utilisateur d'administration qui devra être habilité
 
-3) Accéder à la page Manage Logs Properties
+3) Accéder à la page Gestion des logs (menu Système)
 
 
-Le premier onglet permet de modifier le fichier de surcharge log4j et de savoir quel fichier de configuration des logs est en cours d'utilisation
+La page remonte les fichiers de log écrits par la configuration Log4j 2 de la webapp (WEB-INF/conf/log.properties) ainsi que les fichiers des répertoires définis par la variable managelogs.addlog.folder du plugin (dans la limite des répertoires de managelogs.limit.folder).
 
-Attention la surchage log4j doit contenir l'ensemble de la configuration log4j voulue car le fichier vient se substituer entièrement à la configuration log4j du fichier par défaut.
-
-Le deuxième onglet remonte les fichiers de log définis dans la configuration log4j ainsi que les fichiers définis par la variable managelogs.addlog.folder du plugin.
+La modification à chaud de la configuration des logs n'existe plus depuis la version 1.1.0.
 
 
 ### Informations complémentaires
 Le code du plugin est disponible sur github: https://github.com/lutece-platform/lutece-tech-plugin-managelogs
 
-La version minimum de Lutece supportée est la 5.0.1 (java 7)
+Cette version nécessite Lutece 7 (lutece-core 7.0.0 à 7.x, Log4j 2) et Java 11. Les versions 1.0.x (branche develop_core6) sont destinées à Lutece 6 et les versions 2.x à Lutece 8.

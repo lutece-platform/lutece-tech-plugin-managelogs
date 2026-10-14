@@ -39,8 +39,6 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,16 +61,6 @@ public class ManageLogsUtil
     public static boolean isNullOrEmptyWithTrim( String strInput )
     {
         return strInput == null || strInput.trim().isEmpty();
-    }
-
-    /**
-     * Check if a file is readable on the system file (uses java nio Files and Paths)
-     * @param strFile absolute path
-     * @return result of check
-     */
-    public static boolean isFileReadable( String strFile )
-    {
-        return !isNullOrEmptyWithTrim( strFile ) && Files.isReadable( Paths.get ( strFile ) );
     }
 
     /**
